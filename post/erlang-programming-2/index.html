@@ -1,0 +1,232 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / Erlang Programming 笔记 2</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">Erlang Programming 笔记 2</div><div class="content"><h3 id="4-异常"><a href="#4-异常" class="headerlink" title="4. 异常"></a>4. 异常</h3><ul>
+<li><p>抛出异常</p>
+<ul>
+<li>显式的 <code>exit(Why)</code><ul>
+<li>终止当前 Process</li>
+<li>如果当前 Process 未捕获这个异常，则系统会向所有 link 该 Process 的 Process 广播 <code>&#123;&#39;EXIT&#39;, Pid, Why&#125;</code> 消息</li>
+</ul>
+</li>
+<li>显式的 <code>throw(Why)</code><ul>
+<li>抛出供其调用者捕获的异常</li>
+<li>最好是添加注释说明抛出的异常</li>
+<li>如何处理由调用者选择，包括忽略</li>
+</ul>
+</li>
+<li>系统错误 <code>erlang:error(Why)</code></li>
+</ul>
+</li>
+<li><p><code>try..catch</code> 捕获异常</p>
+<ul>
+<li><p>try&#x2F;catch 本身会消耗一点性能</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/666111/how-do-i-elegantly-check-many-conditions-in-erlang/669075#669075">推荐的 try&#x2F;catch 风格</a></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% 首先对 FuncOrExpressionSequence 求值</span></span><br><span class="line"><span class="comment">%% 如果没有产生异常则顺序进行 Patterm 匹配, 匹配成功后执行后面的表达式</span></span><br><span class="line"><span class="comment">%% 如果有异常抛出, 则顺序匹配 ExPattern(ExceptionType 是 throw、exit、error 中的一个, 默认为 throw)</span></span><br><span class="line"><span class="comment">%% after 块中的代码用于清理工作,绝对会执行</span></span><br><span class="line"><span class="comment">%% after 可以省略</span></span><br><span class="line"><span class="keyword">try</span> FuncOrExpressionSequence <span class="keyword">of</span></span><br><span class="line">    Pattern1 [<span class="keyword">when</span> Guard1] -&gt;Expressions1;</span><br><span class="line">    Pattern2 [<span class="keyword">when</span> Guard2] -&gt;Expressions2;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">catch</span></span><br><span class="line">    ExceptionType: ExPattern1 [<span class="keyword">when</span> ExGuard1] -&gt;ExExpressions1;</span><br><span class="line">    ExceptionType: ExPattern2 [<span class="keyword">when</span> ExGuard2] -&gt;ExExpressions2;</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">after</span></span><br><span class="line">    AfterExpressions</span><br><span class="line"><span class="keyword">end</span>.</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>栈跟踪</p>
+<ul>
+<li><p>在触发异常的时候可以调用 <code>erlang:get_stacktrace/0</code> 来查看最近的栈跟踪信息，可以获得异常函数的调用路径（尾递归调用除外）</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> func()</span><br><span class="line"><span class="keyword">catch</span></span><br><span class="line">	error: X -&gt;</span><br><span class="line">		&#123;X, erlang:get_stacktrace()&#125;</span><br><span class="line"><span class="keyword">end</span>.</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="5-顺序型编程进阶"><a href="#5-顺序型编程进阶" class="headerlink" title="5. 顺序型编程进阶"></a>5. 顺序型编程进阶</h3><ul>
+<li><p>BIF (built-in function)</p>
+<ul>
+<li><p>binary</p>
+<ul>
+<li><p>相对于 List 活着 tuple , binary 更节省内存，输入输出更为高效</p>
+</li>
+<li><p><code>binary_to_term/term_to_binary</code> 可将任何的 binary 和 Erlang 值（List、atom、tuple 甚至 binary 等）转换成为 binary，但是这个 binary 是以所谓的 「外部数据格式」 存储的，类似于其他语言的序列化与反序列化）</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A = &lt;&lt;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>&gt;&gt;.</span><br><span class="line">B = term_to_binary(A).</span><br><span class="line"><span class="comment">%% &lt;&lt;131,109,0,0,0,3,1,2,3&gt;&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>binary 中的数字，每一个都在 0~255 之间（因为每一个数字表示一个 byte，其值在 0000 0000 ~ 1111 1111 [0 ~ 2<sup>9</sup> -1] 之间）</p>
+</li>
+<li><p>GB2312 的汉字转成 UTF-8 时，绝大多数是 3 个字节</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A = &lt;&lt;<span class="string">&quot;且听疯吟&quot;</span>/utf8&gt;&gt;.</span><br><span class="line"><span class="comment">%% &lt;&lt;228,184,148,229,144,172,231,150,175,229,144,159&gt;&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>bit 语法</p>
+<ul>
+<li><p>封包与解包</p>
+<ul>
+<li><p>以 RGB 色彩为例：<br>创建一个 16 bit (2 byte)的内存块，存放一个 RGB 三元组，并为 Red 分配 5 bit，为 Green 分配 6 bit，为 Blue 分配 5 bit</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Red = <span class="number">2</span>,</span><br><span class="line">Green = <span class="number">60</span>,</span><br><span class="line">Blue = <span class="number">29</span>,</span><br><span class="line">RGB = &lt;&lt;Red:<span class="number">5</span>, Green:<span class="number">6</span>, Blue:<span class="number">5</span>&gt;&gt;.</span><br><span class="line"><span class="comment">%% &lt;&lt;23, 157&gt;&gt;</span></span><br><span class="line">&lt;&lt;R1:<span class="number">5</span>, G1:<span class="number">6</span>, B1:<span class="number">5</span>&gt;&gt; = RGB.</span><br><span class="line">&#123;R1, G1, B1&#125;.</span><br><span class="line"><span class="comment">%% &#123;2, 60, 29&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意取值范围。比如我们为 Blue 分配了 5 bit，但是为 Blue 赋值 61，转换成二进制为 111101，超过了 5 bit，则会发生截断，取低五位，即实际值为 29</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">integer_to_list</span><span class="params">(<span class="number">61</span>,<span class="number">2</span>)</span>.</span></span><br><span class="line"><span class="function">%% &quot;111101&quot;</span></span><br><span class="line"><span class="function"><span class="title">integer_to_list</span><span class="params">(<span class="number">29</span>,<span class="number">2</span>)</span>.</span></span><br><span class="line"><span class="function">%% &quot;11101&quot;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;&lt;2:5,60:6,61:5&gt;&gt; == &lt;&lt;2:5,60:6,29:5&gt;&gt;.</span></span><br><span class="line"><span class="function">%% <span class="title">true</span></span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>bit 语法表达式<ul>
+<li>形如 <code>&lt;&lt;E1, E2, E3, ... , En&gt;&gt;</code></li>
+<li>每一个元素都是二进制数据中的一个区块</li>
+<li>元素的值表示有下面几种方式<ul>
+<li><code>Value</code></li>
+<li><code>Value:Size</code></li>
+<li><code>Value/TypeSpecifierList</code></li>
+<li><code>Value:Size/TypeSpecifierList</code></li>
+</ul>
+</li>
+<li>其中 <code>TypeSpecifierList</code> 是形如 <code>End-Sign-Type-Unit</code> 组成的字符串，其中不同的 Type 选项如下，每一个都可以忽略且没有顺序要求：<ul>
+<li><code>End = big / native / little</code><br>决定字节序，默认 big</li>
+<li><code>Sign = signerd / unsigned</code><br>仅用于模式匹配，默认 unsigned</li>
+<li><code>Type = integer/ float / binary</code><br>默认 integer</li>
+<li><code>Unit = 1 / 2 / 3 / ... / 255</code><ul>
+<li>整个区块长度为 Size * Unit，其值必须大于或等于 0 且是 8 的倍数</li>
+<li>其值依赖于 Type，如果 Type 是 integer 或者 float，则值为 1 ，是 binary 则值为 8</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>binary 模式匹配</li>
+</ul>
+</li>
+<li><p>apply</p>
+<ul>
+<li><code>apply(Module, Func, [Arg1, Arg2, ... , Argn])</code></li>
+<li>对于参数个数已知的函数，<code>M:Func([Arg1, Arg2, ... , Argn])</code> 的调用优于 apply</li>
+<li>使用 apply 调用的函数编译器无法优化，同时许多分析工具也无法分析其细节</li>
+<li>如无必要尽量少用 apply</li>
+</ul>
+</li>
+<li><p>属性</p>
+<ul>
+<li>module</li>
+<li>import</li>
+<li>export</li>
+<li>compile<ul>
+<li>编译器选项，常用的 <code>-compile(export_all).</code></li>
+</ul>
+</li>
+<li>vsn<br>无语法意义，用于文档分析</li>
+<li>用户定义属性 <code>-SomeTag(Value)</code><ul>
+<li>该值会被编译进模块</li>
+<li>该值可以在运行时使用 <code>attrs:module_info()</code> 提取</li>
+<li><code>beam_lib</code> 提供了一系列不加载模块代码就能分析的函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>块表达式<br>把多个表达式组织为单个表达式</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span></span><br><span class="line">	Expression1,</span><br><span class="line">	Expression2,</span><br><span class="line">	...</span><br><span class="line">	ExpressionN</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>布尔</p>
+<ul>
+<li>Erlang 中不存在布尔类型，通常使用原子 <code>true/false</code> 代替作为布尔符号使用</li>
+<li>布尔表达式：<code>and / not / or / xor</code></li>
+</ul>
+</li>
+<li><p>字符集</p>
+<ul>
+<li>Erlang 默认编码为 <code>ISO-8859-1 (Latin-1)</code></li>
+<li>Erlang 内部没有字符串数据类型，而是用一串整数列表表示</li>
+<li>因此要注意 Unicode 字符的处理</li>
+<li>使用 unicode 模块中如 <code>unicode:characters_to_list</code> 的函数处理 unicode 字符</li>
+</ul>
+</li>
+<li><p>epp</p>
+<ul>
+<li>Erlang 预处理器，扩展宏，插入必须的包含文件等</li>
+</ul>
+</li>
+<li><p>转义字符</p>
+</li>
+<li><p>表达式&#x2F;表达式序列</p>
+<ul>
+<li>表达式序列的值为序列中最后一个表达式的值</li>
+</ul>
+</li>
+<li><p>函数引用</p>
+</li>
+<li><p>包含文件</p>
+<ul>
+<li><code>include</code></li>
+<li><code>include_lib</code></li>
+</ul>
+</li>
+<li><p>列表操作符</p>
+<ul>
+<li><code>++</code><ul>
+<li>列表添加 <code>ListA ++ ListB</code><br>即把 ListB 附加到 ListA 尾部</li>
+<li>模式匹配中的 <code>++</code><br><code>f(&quot;begin&quot; ++ T) -&gt; ...</code> 即相当于模式匹配 <code>[$b, $e, $g, $i, $n | T]</code></li>
+</ul>
+</li>
+<li><code>--</code><br>列表删除 <code>ListA -- ListN</code> ，即从 ListA 中删除 ListB 中的所有元素，若元素 E 在 B 中重复出现 k 次，则只会从 ListA 中按顺序删除 k 个 E</li>
+</ul>
+</li>
+<li><p>宏</p>
+<ul>
+<li>定义<ul>
+<li>不带参数 <code>-define(Macro, ...)</code></li>
+<li>带参数 <code>-define(Macro(X,Y), ...)</code></li>
+<li>预定义宏<ul>
+<li><code>?FILE</code> 当前文件名</li>
+<li><code>?MODULE</code> 当前模块名</li>
+<li><code>?LINE</code> 当前行号</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>宏的流程控制<ul>
+<li><code>-undef(Macro)</code> 取消宏定义，在此语句后无法使用该宏</li>
+<li><code>ifdef / ifndef / else / end</code></li>
+<li>结合调试标志，扩展 debug 日志输出等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>数值类型</p>
+<ul>
+<li>整型<ul>
+<li>整型的计算是精确的</li>
+<li>其计算结果代表的数据长度只受限于可用内存</li>
+<li>表示法<ul>
+<li>传统表示法，<code>1, 1989, -1337</code></li>
+<li>K 进制整数，<code>2#01001011，16#fe34</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>浮点型<ul>
+<li>内部以 IEEE 754 的 64 bit 格式表示</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>操作符优先级</p>
+</li>
+<li><p>进程字典</p>
+<ul>
+<li><p>每一个 Erlang Process 都有自己的进程字典</p>
+</li>
+<li><p>实际上提供的功能类似于全局变量</p>
+</li>
+<li><p>由于不是非破坏性赋值，会导致代码有副作用</p>
+</li>
+<li><p>尽量少用</p>
+</li>
+<li><p>添加&#x2F;获取进程字典</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@spec put(Key, Value) -&gt; OldValue | undefined.</span><br><span class="line">@spec get(Key) -&gt; Value | undefined.</span><br><span class="line">@spec get() -&gt; [&#123;Key, Value&#125;].</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>引用<br>使用 BIF <code>erlang:make_ref()</code> 创建引用</p>
+</li>
+</ul>
+</li>
+</ul>
+</div><div><ul class="info"><li>posted on 2015-04-22<li><a href="/tags/erlang/">#erlang</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/erlang-programming-2/";
+    this.page.identifier = "post/erlang-programming-2/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

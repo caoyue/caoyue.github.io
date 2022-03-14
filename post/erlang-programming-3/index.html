@@ -1,0 +1,50 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / Erlang Programming 笔记 3</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">Erlang Programming 笔记 3</div><div class="content"><h3 id="6-编译并运行程序"><a href="#6-编译并运行程序" class="headerlink" title="6. 编译并运行程序"></a>6. 编译并运行程序</h3><ul>
+<li>（略）</li>
+</ul>
+<h3 id="7-并发"><a href="#7-并发" class="headerlink" title="7. 并发"></a>7. 并发</h3><ul>
+<li>机制<ul>
+<li>Erlang 程序由成百上千个 Process 组成，这些 Process 之间可以互发消息</li>
+<li>Process 能否接收到或者理解消息是不确定的，要知道结果必须向该 Process 发送消息询问并等待</li>
+<li>Process 之间可以互相 Link ，当 Process 消亡时与之相连的 Process 会收到消息</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-并发编程"><a href="#8-并发编程" class="headerlink" title="8. 并发编程"></a>8. 并发编程</h3><ul>
+<li><p>并发原语</p>
+<ul>
+<li><code>Pid = spawn(Module, FuncName, Args)</code><br>创建一个新的 Process，用于对 Func 求值，并返回该 Process 的 pid</li>
+<li><code>Pid ! Message</code><ul>
+<li>向指定 Pid 的 Process 发送消息，返回值为 Message 本身</li>
+<li>消息发送是异步的，无需等待即可进行其他操作</li>
+</ul>
+</li>
+<li><code>receive ... end</code><ul>
+<li>接收一个发给当前进程的消息</li>
+</ul>
+</li>
+<li><code>self()</code><br>获取自己的 pid</li>
+</ul>
+</li>
+<li><p>注册进程</p>
+<ul>
+<li><code>register(AnAtom, Pid)</code></li>
+<li><code>unregiseter(AnAtom)</code><br>进程死亡时会自动 unregiseter</li>
+</ul>
+</li>
+<li><p>编写并发程序的一般模式</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">-module</span> <span class="params">(concurrency)</span>.</span><br><span class="line"><span class="keyword">-compile</span><span class="params">(export_all)</span>.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">start</span><span class="params">()</span> -&gt;</span></span><br><span class="line">    spawn(?MODULE, loop, []).</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">rpc</span><span class="params">(Pid, Request)</span> -&gt;</span></span><br><span class="line">    Pid ! &#123;self(), Request&#125;,</span><br><span class="line">    <span class="keyword">receive</span></span><br><span class="line">         &#123;Pid, Response&#125; -&gt;</span><br><span class="line">             &#123;Pid, Response&#125;</span><br><span class="line">     <span class="keyword">end</span>.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">loop</span><span class="params">(X)</span> -&gt;</span></span><br><span class="line">    <span class="keyword">receive</span></span><br><span class="line">        &#123;From, Any&#125; -&gt;</span><br><span class="line">            From ! &#123;self(), <span class="string">&quot;Received!&quot;</span>&#125;,</span><br><span class="line">            io:format(<span class="string">&quot;Received: ~p~n&quot;</span>, [Any]),</span><br><span class="line">            loop(X)</span><br><span class="line">    <span class="keyword">end</span>.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% run in erlang shell</span></span><br><span class="line">Pid = concurrency:start().</span><br><span class="line"><span class="comment">%% &lt;0.33.0&gt;</span></span><br><span class="line">concurrency:rpc(Pid, <span class="string">&quot;test！&quot;</span>)</span><br><span class="line"><span class="comment">%% Received: &quot;test&quot;</span></span><br><span class="line"><span class="comment">%% &#123;&lt;0.56.0&gt;,&quot;Received!&quot;&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</div><div><ul class="info"><li>posted on 2015-04-23<li><a href="/tags/erlang/">#erlang</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/erlang-programming-3/";
+    this.page.identifier = "post/erlang-programming-3/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

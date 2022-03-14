@@ -1,0 +1,114 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry"><div class="title"><a href="/post/undefined/">A Wox plugin let you search firefox bookmarks</a></div><div class="content"><p>###关于 Wox<br>最初是看到 V2EX 上的一个帖子 <a target="_blank" rel="noopener" href="https://v2ex.com/t/93922">v2ex.com&#x2F;t&#x2F;93922</a>，然后作者真的去写了并且发布在 Github 上了。<br>Windows 上的快速启动软件已经很多了，但是不管从功能、界面乃至理念来讲和 Alfred 都相去甚远，尤其是 Workflow 的概念。<br>Wox 现在发布了第一个 beta 版本，看上去已经很不错了，希望这个项目能坚持下去吧。</p>
+<p>###Wox.Plugin.FirefoxBookmarks<br>Wox 的插件开发也比较简单，可以参考文档。写了个搜索 Firefox 书签的插件。<br>原理是读取 Firefox 书签，然后根据参数查询返回结果。</p>
+<p>首先我们要获取到 Firefox Profile 的位置。Firefox 支持多个 Profile，我们可以获取到默认的 Profile 。Firefox Profile 路径及配置都保存在 <code>%appdata%\Mozilla\Firefox\profiles.ini</code> 中。打开这个配置文件可以看到每个 Profile 配置包含的参数：”IsRelative” 值为 “0” 代表绝对路径，”1” 代表相对路径；”Default&#x3D;1” 代表默认启动的 Profile。<br>虽然可以通过引入 WindowsAPI （即 <code>[DllImport(&quot;kernel32&quot;)]</code>）来解析 ini 配置文件，不过无需如此小题大做，毕竟只需要找到其中一行即可。下面是一个读取 Firefox 默认 Profile 的方法：</p>
+<p><code>gist 11324134</code></p>
+<p>这种读取方法对某些 Portable 版本无效，所以同时也提供了手动配置路径的方法。</p>
+<p>Firefox 书签以及历史记录都保存在 Profile 里的 places.sqlite 中。其表结构可以参考 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/The_Places_database">developer.mozilla.org&#x2F;en-US&#x2F;docs&#x2F;The_Places_database</a>。<br>其中 moz_bookmarks 表中存储了书签及书签文件夹，且通过外键 fk 和 moz_places 关联。<br>Sqlite 的查询语法基本和标准 SQL 相同，比如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> moz_places.url, moz_bookmarks.title,parent.title <span class="keyword">as</span> parent</span><br><span class="line"><span class="keyword">FROM</span> moz_bookmarks</span><br><span class="line"><span class="keyword">JOIN</span> moz_places <span class="keyword">ON</span> moz_places.id <span class="operator">=</span> moz_bookmarks.fk</span><br><span class="line"><span class="keyword">JOIN</span> moz_bookmarks <span class="keyword">as</span> parent <span class="keyword">ON</span> parent.id <span class="operator">=</span> moz_bookmarks.parent</span><br><span class="line"><span class="keyword">WHERE</span> moz_bookmarks.type <span class="operator">=</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>PS. 另一个快速切换电源计划的插件 <a target="_blank" rel="noopener" href="https://github.com/caoyue/Wox.Plugin.PowerPlan">Wox.Plugin.PowerPlan</a></p>
+</div><div><ul class="info"><li>2014-04-25</li><li><a href="/tags/project/">#project</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/undefined/">Firefox 的表单缓存「Bug」</a></div><div class="content"><p>##问题<br>在使用 Firefox 测试网站的时候遇到一个奇怪的问题。<br>把一份数据写入类型为 hidden 的 input 中时，比如</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;hidden&quot;</span> <span class="attr">value</span>=<span class="string">&quot;@Model.Count&quot;</span> <span class="attr">id</span>=<span class="string">&quot;Count&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在用 Javascript 修改这个值，比如后台数据原为 0，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> count = <span class="built_in">parseInt</span>($(<span class="string">&quot;#Count&quot;</span>).val());</span><br><span class="line">$(<span class="string">&quot;#Count&quot;</span>).val(count + <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>不提交表单，刷新页面，发现 <code>$(&quot;#Count&quot;).val()</code> 的值却不是后台数据的 0，而是我们修改过后的值，这个值被缓存了。</p>
+<p>##原因<br>使用其他浏览器测试可以发现，这个问题仅出现在 Firefox 中。从而可以考虑是否 Firefox 对表单缓存的实现「有问题」。</p>
+<p>##解决<br>设置 form 的 <code>autocomplete=&quot;off&quot;</code></p>
+</div><div><ul class="info"><li>2013-09-07</li><li><a href="/tags/programming/">#programming</a></li><li><a href="/tags/firefox/">#firefox</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/whoosh-search/">Whoosh 全文搜索</a></div><div class="content"><p>Whoosh 是一个纯 Python 实现的全文搜索组件。基础架构和 Lucene 比较像。使用试了试，记录一些东西。</p>
+<p><strong>中文分词</strong><br>Whoosh 本身只有英文分词，因此需要添加中文分词组件。<br>最后选择了 <a target="_blank" rel="noopener" href="https://github.com/fxsjy/jieba">Jieba</a> 这个 Python 中文分词组件，初步测试分词效果还不错。有时间会把几个中文分词组件对比一下看看。<br>Jieba 已经封装好了 ChineseAnalyzer for Whoosh，只需要引用 <code>from jieba.analyse import ChineseAnalyzer</code> 来替换 Whoosh 的 Analyzer 即可。</p>
+<p><strong>HTML 抽取</strong><br>对于纯文本直接分析建立索引即可。<br>而对于 HTML 文本，我们需要先将其中的文本抽取出来再进行运行分析程序。否则其中的 HTML 标签将会被当作文本来分析，比如搜索 “span” 将会得到所有包含 <code>&lt;span&gt;&lt;/span&gt;</code> 的内容。举个例子，用 HTMLParser 来提取文本，其他类似功能的模块也有不少。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">html_strip</span>(<span class="params">html</span>):</span></span><br><span class="line">    <span class="keyword">from</span> HTMLParser <span class="keyword">import</span> HTMLParser</span><br><span class="line">    html = html.strip()</span><br><span class="line">    html = html.strip(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">    result = []</span><br><span class="line">    parse = HTMLParser()</span><br><span class="line">    parse.handle_data = result.append</span><br><span class="line">    parse.feed(html)</span><br><span class="line">    parse.close()</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&quot;</span>.join(result)</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键词 Highlight</strong><br>默认的高亮结果只会包含结果命中的部分碎片，需要不同展示可以使用不同的 Fragmenters 。比如展示全文需要 <code>whoosh.highlight.WholeFragmenter</code> 。<br>然而 HTML 的高亮有一个问题。简单的基于匹配的替换带来的问题就是 HTML 标签的属性内容也被替换了，比如 <code>a</code> 标签的 <code>href</code> 属性，导致结构发生错乱。对此除了自己写 HTMLFragmenter 之外似乎没有现成的解决办法。<br>考虑到服务端解析的效率问题，放弃 Whoosh 和服务端的高亮，使用 js 在客户端高亮(其原理也是通过判断关键词前后的标签匹配，并经过一系列的正则替换最终实现只替换文本关键词而忽略标签)。试过效果比较好的高亮方案，<a target="_blank" rel="noopener" href="https://github.com/jbr/jQuery.highlightRegex">https://github.com/jbr/jQuery.highlightRegex</a><br>只需要在 <code>results = searcher.search(q, terms=True)</code> 时设置 <code>terms=True</code> 即可从 results 或 results 的 hit 中取得关键词 <code>terms = results.matched_terms()</code>，然后将关键词传递给前端用 highlightRegex 来高亮。</p>
+<p><strong>结果分页</strong><br>对于结果的分页，whoosh 提供了 <code>search_page</code> 方法。但是这个方法可以说是个半成品。首先，search_page 方法支持的参数设置较少，很多功能没法在 search_page 中完成。其次，search_page 方法返回的结果为 ResultsPage 类型，而 <code>search</code> 方法返回 Results 类型，且这两者之前并无继承关系，Results 中包含的属性比 ResultsPage 丰富得多。<br>最重要的是，到目前为止，使用 search_page 方法从所有结果中获取中间页时，其性能与使用 search 获取所有结果然后手动分页是一样的，从源代码可以看到 search_page 仅仅是对 search 的一次封装。search_page 仅仅是出于方便使用的功能（虽然我也没看出 search_page 存在的意义和方便在哪…… ）<br>因此，还是使用 search 的 limit 参数来满足分页需求。limit 参数限制了返回的结果数目。可以使用</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">results = searcher.search(q, limit=page * pagesize)</span><br></pre></td></tr></table></figure>
+
+<p>来控制返回的结果，然后使用</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">results[(page - <span class="number">1</span>) * pagesize:page * pagesize]</span><br></pre></td></tr></table></figure>
+
+<p>获取指定的分页。</p>
+<p><strong>词典选择</strong><br>中文分词的效果有很大一部分取决于词典，但并不是词典越大越全越好。分析词典 Build Trie 是一个比较消耗 CPU 的过程（虽然只是在第一次需要进行这个过程，之后会读取 Cache 中的 Model），越大的词典分析时消耗的资源也越大。因此根据实际情况选择词典比较好。<br>此外，如果需要分析的文本包含许多专业性词汇，也可以考虑设置自定义词典来增强歧义分析能力。<br>词典的设置很简单，使用 <code>jieba.set_dictionary(dict_path)</code> 即可。</p>
+<p><strong>其他</strong></p>
+<p>虽然 Whoosh 的性能不尽如人意，相关资料和扩展也缺乏。<br>但总体来说，对于小规模的使用，whoosh 开发简单，基本可以满足需求，如果使用过 Lucene 也可以很容易上手。而且纯 Python 实现，看源代码也方便。</p>
+</div><div><ul class="info"><li>2013-08-05</li><li><a href="/tags/python/">#python</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/project-timeline/">Project Timeline</a></div><div class="content"><p>做了一个同步微博、Twitter 和 Rss Feed 到本地的工具，方便保存和查看自己的数据，以及用自己的数据做一些好玩的事。</p>
+<hr>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/caoyue/MyTimeline">MyTimeline</a></strong></p>
+<ul>
+<li><p>聚合分散在各个网站上的 Timeline<br>Support:</p>
+<ul>
+<li>Rss Feed</li>
+<li>Twitter Oauth</li>
+<li>Weibo Oauth</li>
+</ul>
+</li>
+<li><p>同步发送消息到第三方<br><a target="_blank" rel="noopener" href="http://i.caoyue.me/update">&#x2F;update</a><br>Support:</p>
+<ul>
+<li>Twitter</li>
+<li>Weibo</li>
+</ul>
+</li>
+<li><p>按日期查看过往记录<br><a target="_blank" rel="noopener" href="http://i.caoyue.me/past">&#x2F;past</a></p>
+</li>
+<li><p>对所有记录的统计图表<br><a target="_blank" rel="noopener" href="http://i.caoyue.me/statistic">&#x2F;statistic</a><br>Support：</p>
+<ul>
+<li>按时段统计</li>
+<li>按月份统计</li>
+<li>按分类统计</li>
+</ul>
+</li>
+</ul>
+<p><strong>TODO</strong></p>
+<ul>
+<li>其他第三方支持</li>
+<li>搜索</li>
+<li>Other…</li>
+</ul>
+<p><strong>Tools</strong></p>
+<ul>
+<li>Linux</li>
+<li>Python</li>
+<li>Web.py</li>
+<li>Nginx&#x2F;Gunicorn</li>
+<li>MySql</li>
+<li>Google Chart</li>
+</ul>
+<p><strong>Demo</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://i.caoyue.me/">Demo</a></li>
+</ul>
+<p><strong>License</strong></p>
+<ul>
+<li>MIT</li>
+</ul>
+<p><em>Feel free to give me some feedback:)</em></p>
+</div><div><ul class="info"><li>2013-07-30</li><li><a href="/tags/project/">#project</a></li><li><a href="/tags/python/">#python</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/goodby-google-reader/">Goodbye Google Reader</a></div><div class="content"><p>Google Reader 关闭了。<br>重度拖延症的坏处就是直到这两天才开始寻找替代品。不考虑自建服务了，抓取和存储、搜索都成问题，跨平台支持也少有做好的。<br>不出意外就在目前大热的线上服务 Feedly 和 Digg Reader 中选了。<br>遗憾的是基本没有一家能完全满足需求——也许也只是在强求另一个 Google Reader 的完美复制品罢了。但是残缺不全的功能——基础的搜索都没有、极低的抓取频率确实也很难让人满意。</p>
+<p>那么 Google Reader 到底好在哪呢？<br>从 Google Reader 出来之后其他 RSS 订阅服务基本都死气沉沉了就可想而知了。</p>
+<p>我个人的体会：<br>1、界面功能简洁实用。现在大热的 Feedly 到 Digg Reader 哪个不是借鉴了 Google Reader 的功能和界面？<br>2、搜索，比起手动同步到 Evernote 什么的，只要你记得在 Google Reader 里面看过，搜索就行了。而这些结果天生就是被组织过的——这才是符合我需要的个性化搜索啊！<br>3、被 Google 砍掉的社交功能，这是我认为 Google 做过的最好的社交产品，可惜了。比如可以订阅别人的分享，很容易发现一些有趣的东西。看大牛今天看了什么内容不比听他们闲话家常有意思么？<br>4、Google 的强大抓取和存储。对比 Feedly 和 Digg Reader 很明显，Google 的抓取频率要高得多。而一旦被抓到，这些条目都会存储在 Google 的服务器上，不用担心网站会消失。而且方便的加星和 Tag 可以很好的组织知识库。<br>5、算法推荐排序。Google Reader 有一个神奇排序，会根据你的阅读历史，条目 like 人数等等因数来排序。据说有人用 Google 的精准推荐来做和谐订阅搜集……<br>6、Google 的稳定服务，曾经我们都以为 Google 永远是可靠的……</p>
+<p>就算 Google Reader 拥有如此高的用户粘性和活跃度，它还是死了。<br>虽然社交搜索很热门，也许是未来的趋势。但是并不是非此即彼，我们总需要一个空间来过滤、积累和整合信息。<br>Google 内部限制死了 Google Reader 的发展，使它所做过的一系列有意思的扩展最后都为他人做了不那么好看的嫁衣，但愿 Google Reader 的死去能让 RSS 更活跃，也算功德一件了。</p>
+<p>Goodbye, Google Reader!</p>
+</div><div><ul class="info"><li>2013-07-02</li><li><a href="/tags/life/">#life</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/reference-in-csharp/">Reference in CSharp</a></div><div class="content"><p>起因是 V2EX 的一个<a target="_blank" rel="noopener" href="http://v2ex.com/t/74234">帖子</a>.<br>C++ 中引用是一个很基础但是也很容易忽略的问题，那么在 C# 中呢？看下面的 Gist.</p>
+<p><code>gist 5898137</code></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>C# 中引用类型参数是按引用(即指针地址)来传递的，所以我们使用第一个 Swap 方法——结果是 a 和 b 的值没有变化。<br>再使用 ref 试试，OK，a 和 b 的值交换了。</p>
+<p>再看没有使用 ref 的 Swap 方法。<code>temp = a</code> 实际上是令 temp 形参作为 Swap 函数的局部变量，即在栈上开辟空间存储了实参 a 指向的堆地址（形参 a 和 b 同理）。<br>操作完成后，可以看出，仅仅是在栈上的形参 temp、a、b 所存储的堆地址发生了改变，而原实参 a、b 所存储的堆地址并没有发生变化。</p>
+<h3 id="C-的引用传递和值传递"><a href="#C-的引用传递和值传递" class="headerlink" title="C# 的引用传递和值传递"></a>C# 的引用传递和值传递</h3><p>引用类型作为参数时：</p>
+<ul>
+<li><p>在修改变量本身时，结果类似于值传递，即不会改变传递前的变量的值，换句话说就是值传递传的是对象的值拷贝，而引用类型参数的值实际上就是其指向的堆对象的指针地址<br>即值传递传的是对象的值拷贝，函数内参数对象是调用时传递的对象的栈中对象的拷贝。</p>
+</li>
+<li><p>在修改变量的属性或字段时是引用传递，会影响到传递前的变量的值<br>如代码中，如果交换 a 和 b 的成员的值，则会修改实际对象的值。比如 <code>SwapValue</code> 方法可以成功交换。<br>这是因为形参 a 指向了堆中对象，修改其字段值实际上也就修改了该对象的字段，而实参 a 和 形参 a 指向的是同一对象，所以也就修改了实参 a 的值</p>
+</li>
+<li><p>参数使用了 ref 后，才是引用传递。不管修改变量本身还是修改变量的属性或字段，都会影响到传递前的变量的值<br>因为使用 ref 后，传递了实参 a 自身在栈上的地址而不是堆中对象的地址（即 C&#x2F;C++ 中指针的指针）。因此改变形参 a 实际上就相当于改变了实参 a。同时通过操纵引用可以间接操纵 a 的字段。</p>
+</li>
+</ul>
+<h3 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h3><ul>
+<li>Stack 堆栈，Heap 托管堆</li>
+<li>事实上关于引用传递和值传递这两个概念实际上没有很好的定义，反而容易产生误解</li>
+<li>一般情况下可以将 C# 的引用理解为指针，但是实际上它们还是有区别的</li>
+</ul>
+<p>P.S. 如果你使用 ReSharper 的话，你会发现第一个 Swap 方法中 ReSharper 提示 a 和 b <code>value assigned is not used</code>，交换变量的三行代码其实都可以 Remove。</p>
+<hr>
+<h4 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h4><p>看起来好像解释的更不清楚了<br>关于所谓的「引用传递」和「值传递」，其实大可不必纠结这个名称，弄清楚这些是怎么作用的就好</p>
+<p>感觉变成了「看了一些容易误解的技术文章，然后写了一些更容易误解的文章」的循环 😅</p>
+</div><div><ul class="info"><li>2013-07-01</li><li><a href="/tags/csharp/">#csharp</a></li></ul></div></div><div class="pager"><a class="pre" href="/page/6/">Previous</a>   <a class="next" href="/page/8/">Next</a></div></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

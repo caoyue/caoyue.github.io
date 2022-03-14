@@ -1,0 +1,189 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry"><div class="title"><a href="/post/supervisor-simple-one-for-one/">Erlang/OTP Supervisor : one-for-one and simple-one-for-one</a></div><div class="content"><p>Supervisor 的四个 Restart Strategy 中，关于 one for one 和 simple one for one , 虽然很多地方都说 simple one for one 是 one for one 的简化版，但两者之间还是有一些不同。</p>
+<h4 id="1-先来看一个简单的-one-for-one-和-simple-one-for-one-的例子"><a href="#1-先来看一个简单的-one-for-one-和-simple-one-for-one-的例子" class="headerlink" title="1. 先来看一个简单的 one for one 和 simple one for one 的例子"></a>1. 先来看一个简单的 one for one 和 simple one for one 的例子</h4><ul>
+<li><p>one for one</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">init</span><span class="params">(_Args)</span> -&gt;</span></span><br><span class="line">    &#123;ok, &#123;&#123;one_for_one, <span class="number">1</span>, <span class="number">60</span>&#125;,</span><br><span class="line">          [&#123;call, &#123;call, start_link, []&#125;,</span><br><span class="line">            permanent, brutal_kill, worker, [call]&#125;]&#125;&#125;.</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>simple one for one</li>
+</ul>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">init</span><span class="params">(_Args)</span> -&gt;</span></span><br><span class="line">    &#123;ok, &#123;&#123;simple_one_for_one, <span class="number">0</span>, <span class="number">1</span>&#125;,</span><br><span class="line">          [&#123;call, &#123;call, start_link, []&#125;,</span><br><span class="line">            permanent, brutal_kill, worker, [call]&#125;]&#125;&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>初始化方法非常相似</p>
+</li>
+</ul>
+<h4 id="2-启动-Supervisor"><a href="#2-启动-Supervisor" class="headerlink" title="2. 启动 Supervisor"></a>2. 启动 Supervisor</h4><ul>
+<li>one for one<br>启动时，会同时启动一个子进程</li>
+<li>simple one for one<br>启动时，supervisor 并不会启动任何子进程，所有的子进程都是通过 <code>supervisor:start_child(Sup, List)</code> 来动态添加的</li>
+</ul>
+<h4 id="3-允许的-Child-Type"><a href="#3-允许的-Child-Type" class="headerlink" title="3. 允许的 Child Type"></a>3. 允许的 Child Type</h4><ul>
+<li>one for one<br>允许不同的 child type，所以每次添加子进程都需要传递完整的 child spec</li>
+<li>simple one for one<br>只能有一个 child type，不同的 child instance 可以共享同一个 child spec</li>
+</ul>
+<h4 id="4-添加子进程"><a href="#4-添加子进程" class="headerlink" title="4. 添加子进程"></a>4. 添加子进程</h4><ul>
+<li><p>one for one<br>添加子进程的时候传递的是子进程规格</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisor:start_child(Sup, ChildSpec)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>simple one for one<br>添加子进程的时候传递的是任意的值列表，它将会被添加到子进程规格中的参数列表中，即实际上是通过 <code>apply(call, start_link, [] ++ List)</code> 来启动的</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisor:start_child(Sup, List)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>相同的是，如果 supervisor 挂了，并且被 restart，之前动态添加的子进程将会全部丢失</p>
+<h4 id="5-Supervisor-停止"><a href="#5-Supervisor-停止" class="headerlink" title="5. Supervisor 停止"></a>5. Supervisor 停止</h4><ul>
+<li>one for one<br>按照启动 Spec 相反的顺序停止所有子进程，然后停止自身</li>
+<li>simple one for one<br>由于 supervisor 启动的是同一子进程的多个 instance，因此在停止的时候不存在顺序，<br>在定义 Shutdown Strategy 的时候应该注意其 terminate 表现的区别。</li>
+</ul>
+</div><div><ul class="info"><li>2015-01-20</li><li><a href="/tags/erlang/">#erlang</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/ejabberd-apns/">ejabberd: Apple Push Notification Service</a></div><div class="content"><p>主要是通过 hook ejabberd 的离线消息处理，从而实现针对离线消息进行推送</p>
+<h4 id="1-Hook-offline-message"><a href="#1-Hook-offline-message" class="headerlink" title="1. Hook offline message"></a>1. Hook offline message</h4><ul>
+<li><p>记录 device token<br>这一步没啥好说的，iOS 连接到 APNs 后获取到 device token，发给服务器，服务器负责维护好对应关系即可。<br>注意客户端退出时清理掉相应记录。</p>
+</li>
+<li><p>在 ejabberd 中新增一个模块，注册 <code>offline_message_hook</code>，大致如下：</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">start</span><span class="params">(Host, Opts)</span> -&gt;</span></span><br><span class="line">?INFO_MSG(<span class="string">&quot;Starting mod_push_service&quot;</span>, []),</span><br><span class="line">register(?MODULE, spawn(?MODULE, init, [Host, Opts])),</span><br><span class="line">ok.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">init</span><span class="params">(Host, _Opts)</span> -&gt;</span></span><br><span class="line">    ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, send_notification, <span class="number">10</span>),</span><br><span class="line">    ok.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">stop</span><span class="params">(Host)</span> -&gt;</span></span><br><span class="line">    ?INFO_MSG(<span class="string">&quot;Stopping mod_push_service&quot;</span>, []),</span><br><span class="line">    ejabberd_hooks:delete(offline_message_hook, Host,</span><br><span class="line">        ?MODULE, send_notification, <span class="number">10</span>),</span><br><span class="line">    ok.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">send_notification</span><span class="params">(From, To, Packet)</span> -&gt;</span></span><br><span class="line">    dosomething.</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-Implement-APNs"><a href="#2-Implement-APNs" class="headerlink" title="2. Implement APNs"></a>2. Implement APNs</h4><ul>
+<li><p>从 Apple 获取推送证书</p>
+</li>
+<li><p>在服务端使用该证书建立 ssl 连接</p>
+</li>
+<li><p>按照 Apple 文档生成指定格式的 Payload 并发送</p>
+</li>
+<li><p>Apple 同时提供了 feedback channel 来获取失效 token 便于服务端获取记录，实现方式和发送消息类似，区别在于一个是发送消息，一个是接收消息</p>
+</li>
+<li><p>连接的粗略代码如下</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">-module</span><span class="params">(apntest)</span>.</span><br><span class="line"><span class="keyword">-export</span><span class="params">([connect/<span class="number">0</span>])</span>.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">connect</span><span class="params">()</span> -&gt;</span></span><br><span class="line">    application:start(asn1),</span><br><span class="line">    application:start(crypto),</span><br><span class="line">    application:start(public_key),</span><br><span class="line">    application:start(ssl),</span><br><span class="line">    Address = <span class="string">&quot;gateway.sandbox.push.apple.com&quot;</span>,</span><br><span class="line">    Port = <span class="number">2195</span>,</span><br><span class="line">    Cert = <span class="string">&quot;cert.pem&quot;</span>,</span><br><span class="line">    Options = [&#123;certfile, Cert&#125;, &#123;mode, binary&#125;],</span><br><span class="line">    Timeout = <span class="number">10000</span>,</span><br><span class="line">    <span class="keyword">case</span> ssl:connect(Address, Port, Options, Timeout) <span class="keyword">of</span></span><br><span class="line">        &#123;ok, Socket&#125; -&gt;</span><br><span class="line">            PayloadString = <span class="string">&quot;&#123;\&quot;aps\&quot;:&#123;\&quot;alert\&quot;:\&quot;Hello world.\&quot;,\&quot;sound\&quot;:\&quot;chime\&quot;, \&quot;badge\&quot;:1&#125;&#125;&quot;</span>,</span><br><span class="line">            Payload = list_to_binary(PayloadString),</span><br><span class="line">            PayloadLength = size(Payload),</span><br><span class="line">            Packet = &lt;&lt;<span class="number">0</span>:<span class="number">8</span>,</span><br><span class="line">            <span class="number">32</span>:<span class="number">16</span>/big,                <span class="number">16#ff496f96352abb7c875bedfc755287</span>XXXXXXe14bfadade9ff6ba75360de65441:<span class="number">256</span>/big,</span><br><span class="line">            PayloadLength:<span class="number">16</span>/big,</span><br><span class="line">            Payload/binary&gt;&gt;,</span><br><span class="line">            ssl:send(Socket, Packet),</span><br><span class="line">            ssl:close(Socket),</span><br><span class="line">            PayloadString;</span><br><span class="line">        &#123;error, Reason&#125; -&gt;</span><br><span class="line">            Reason</span><br><span class="line">    <span class="keyword">end</span>.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>有一些开源的 Erlang APNs 推送服务实现，比如 <a target="_blank" rel="noopener" href="https://github.com/inaka/apns4erl">apns4erl</a>，不过这个项目实在引用了太多不必要的东西了 XD，还是推荐自己看懂后根据需求重新实现，代码也不复杂</p>
+</li>
+</ul>
+</div><div><ul class="info"><li>2015-01-01</li><li><a href="/tags/erlang/">#erlang</a></li><li><a href="/tags/ejabberd/">#ejabberd</a></li><li><a href="/tags/apple/">#apple</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/ejabberd-mam/">ejabberd-MAM</a></div><div class="content"><h3 id="MAM-Message-Archive-Management"><a href="#MAM-Message-Archive-Management" class="headerlink" title="MAM - Message Archive Management"></a>MAM - Message Archive Management</h3><h4 id="1-Message-Archive"><a href="#1-Message-Archive" class="headerlink" title="1. Message Archive"></a>1. Message Archive</h4><ul>
+<li>Archiving <br/><br>archived tag<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">message</span> <span class="attr">to</span>=<span class="string">&#x27;juliet@capulet.lit/balcony&#x27;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">from</span>=<span class="string">&#x27;romeo@montague.lit/orchard&#x27;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">type</span>=<span class="string">&#x27;chat&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Call me but love, and I&#x27;ll be new baptized; Henceforth I never will be Romeo.<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">archived</span> <span class="attr">by</span>=<span class="string">&#x27;juliet@capulet.lit&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;28482-98726-73623&#x27;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="2-Querying"><a href="#2-Querying" class="headerlink" title="2. Querying"></a>2. Querying</h4><ul>
+<li><p>Filtering</p>
+<ul>
+<li>by jid<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">type</span>=<span class="string">&#x27;get&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;juliet1&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">query</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">with</span>&gt;</span>juliet@capulet.lit<span class="tag">&lt;/<span class="name">with</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">query</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>by time<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">type</span>=<span class="string">&#x27;get&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;juliet1&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">query</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">start</span>&gt;</span>2010-06-07T00:00:00Z<span class="tag">&lt;/<span class="name">start</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">end</span>&gt;</span>2010-07-07T13:23:54Z<span class="tag">&lt;/<span class="name">end</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">query</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>by max number</li>
+<li>by uid of message</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">type</span>=<span class="string">&#x27;get&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;q29303&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">query</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">start</span>&gt;</span>2010-08-07T00:00:00Z<span class="tag">&lt;/<span class="name">start</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">set</span> <span class="attr">xmlns</span>=<span class="string">&#x27;http://jabber.org/protocol/rsm&#x27;</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">max</span>&gt;</span>10<span class="tag">&lt;/<span class="name">max</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">after</span>&gt;</span>09af3-cc343-b409f<span class="tag">&lt;/<span class="name">after</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">query</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">message</span> <span class="attr">id</span>=<span class="string">&#x27;aeb213&#x27;</span> <span class="attr">to</span>=<span class="string">&#x27;juliet@capulet.lit/chamber&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">result</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span> <span class="attr">queryid</span>=<span class="string">&#x27;f27&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;28482-98726-73623&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">forwarded</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:forward:0&#x27;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">delay</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:delay&#x27;</span> <span class="attr">stamp</span>=<span class="string">&#x27;2010-07-10T23:08:25Z&#x27;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">message</span> <span class="attr">to</span>=<span class="string">&#x27;juliet@capulet.lit/balcony&#x27;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">from</span>=<span class="string">&#x27;romeo@montague.lit/orchard&#x27;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">type</span>=<span class="string">&#x27;chat&#x27;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">body</span>&gt;</span>Call me but love, and I&#x27;ll be new baptized; Henceforth I never will be Romeo.<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">forwarded</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">result</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">message</span> <span class="attr">id</span>=<span class="string">&#x27;aeb214&#x27;</span> <span class="attr">to</span>=<span class="string">&#x27;juliet@capulet.lit/chamber&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">result</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span> <span class="attr">queryid</span>=<span class="string">&#x27;f27&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;5d398-28273-f7382&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">forwarded</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:forward:0&#x27;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">delay</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:delay&#x27;</span> <span class="attr">stamp</span>=<span class="string">&#x27;2010-07-10T23:09:32Z&#x27;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">message</span> <span class="attr">to</span>=<span class="string">&#x27;romeo@montague.lit/orchard&#x27;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">from</span>=<span class="string">&#x27;juliet@capulet.lit/balcony&#x27;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">type</span>=<span class="string">&#x27;chat&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;8a54s&#x27;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">body</span>&gt;</span>What man art thou that thus bescreen&#x27;d in night so stumblest on my counsel?<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">forwarded</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">result</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-Preferences"><a href="#3-Preferences" class="headerlink" title="3. Preferences"></a>3. Preferences</h4><ul>
+<li><p>jid list</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">type</span>=<span class="string">&#x27;set&#x27;</span> <span class="attr">id</span>=<span class="string">&#x27;juliet2&#x27;</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">prefs</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:mam:tmp&#x27;</span> <span class="attr">default</span>=<span class="string">&#x27;roster&#x27;</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">always</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">jid</span>&gt;</span>romeo@montague.lit<span class="tag">&lt;/<span class="name">jid</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">always</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">never</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">jid</span>&gt;</span>montague@montague.lit<span class="tag">&lt;/<span class="name">jid</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">never</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">prefs</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>option:<ul>
+<li>always - all messages are archived by default.</li>
+<li>never - messages are never archived by default.</li>
+<li>roster - messages are archived only if the contact’s bare JID is in the user’s roster</li>
+</ul>
+</li>
+<li>rules:<ul>
+<li>outgoing - use ‘to’ attribute</li>
+<li>incomming - use ‘from’ attribute</li>
+<li>contains resource - compare</li>
+<li>no resource - any resource</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Ad-Hoc Commands<br/><br><a target="_blank" rel="noopener" href="http://xmpp.org/extensions/xep-0050.html">http://xmpp.org/extensions/xep-0050.html</a></p>
+</li>
+</ul>
+<h4 id="4-Security"><a href="#4-Security" class="headerlink" title="4. Security"></a>4. Security</h4><ul>
+<li>archived tag</li>
+<li>only user authorized have permission</li>
+<li>privacy</li>
+</ul>
+<h4 id="5-MongooseIM-Config-odbc"><a href="#5-MongooseIM-Config-odbc" class="headerlink" title="5. MongooseIM Config (odbc)"></a>5. MongooseIM Config (odbc)</h4><ul>
+<li><code>&#123;mod_mam, []&#125;</code><br>enable mam</li>
+<li><code>&#123;mod_mam_odbc_prefs, [pm]&#125;</code><br>archiving preferences<br>pm : user-to-user messages<br>muc : multiple user</li>
+<li><code>&#123;mod_mam_odbc_user, [pm, muc]&#125;</code><br>converting an archive id to an integer</li>
+<li><code>&#123;mod_mam_odbc_arch, [pm, muc]&#125;</code><br>archiving message</li>
+<li><code>mod_mam_odbc_async_writer</code> <br/>Asynchronous writer, will insert batches of messages.<br>option <code>no_writer</code> set in <code>mod_mam_odbc_arch</code></li>
+</ul>
+</div><div><ul class="info"><li>2014-12-23</li><li><a href="/tags/erlang/">#erlang</a></li><li><a href="/tags/ejabberd/">#ejabberd</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/ejabberd-login/">ejabberd Login module</a></div><div class="content"><p>懒得贴代码，画个渣图看下好了。<br><img src="http://ww2.sinaimg.cn/large/3e69b0ccgw1ekht46lt4pj20ss0ngq5i.jpg" alt="ejabberd login module"></p>
+<p>P.S 从图上可以看出 XMPP 确实是细（fán）致（suǒ）之极了，考虑到在移动设备上的使用，这样的效率肯定是无法接受的。<br>对特定的服务来说，没有必要做如此多的交互步骤，考虑做一些简化。</p>
+<hr>
+<h3 id="Update-详细的-login-流程"><a href="#Update-详细的-login-流程" class="headerlink" title="Update: 详细的 login 流程"></a>Update: 详细的 login 流程</h3><p><code>gist d0ec83e9aa3c1899287d</code></p>
+</div><div><ul class="info"><li>2014-09-16</li><li><a href="/tags/erlang/">#erlang</a></li><li><a href="/tags/ejabberd/">#ejabberd</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/xmpp-protocol/">XMPP protocol</a></div><div class="content"><h3 id="XMPP-协议"><a href="#XMPP-协议" class="headerlink" title="XMPP 协议"></a>XMPP 协议</h3><p>XMPP 协议是一种基于 XML 的 IM 协议，其前身是 jabber，后来被 IETF 标准化。其他信息可以参考 <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/XMPP">wikipedia</a>.</p>
+<h4 id="协议架构"><a href="#协议架构" class="headerlink" title="协议架构"></a>协议架构</h4><ul>
+<li>通过 TCP socket 与 XMPP 服务器进行通信</li>
+<li>传输的是预定格式的 XML 信息</li>
+<li>通过解析 XML 提取请求类型和消息</li>
+</ul>
+<h4 id="消息格式"><a href="#消息格式" class="headerlink" title="消息格式"></a>消息格式</h4><ul>
+<li><p>一个实体在 XMPP 网络中被称为一个节点，它有唯一的标示符 jabber identifier (JID)，实体可以是用户或者聊天室</p>
+</li>
+<li><p>XMPP 中定义了 3 个顶层元素： <code>Message</code>、<code>Presence</code>、<code>IQ</code></p>
+<ul>
+<li><p>Message<br/><br>基本的消息通讯格式：<br/></p>
+<ul>
+<li>To：消息的接收方</li>
+<li>from : 发送方的 JID</li>
+<li>body: 要发送的消息</li>
+<li>type:<br/><ul>
+<li>normal：单纯的消息，不要求响应；</li>
+<li>chat：IM 消息</li>
+<li>groupchat：聊天室 group chat</li>
+<li>headline：发送 alert 和 notification 消息</li>
+<li>error：发送 message 出错时通知</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">message</span> <span class="attr">from</span>=<span class="string">&#x27;nobody@caoyue.me/test&#x27;</span></span></span><br><span class="line"><span class="tag"> <span class="attr">to</span>=<span class="string">&#x27;anybody@caoyue.me&#x27;</span> <span class="attr">type</span>=<span class="string">&#x27;chat&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Anybody?<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Presence<br/><br>用来表明用户的状态，如：online、away、dnd (请勿打扰)等。<br>当用户离线或改变自己的状态时，就会在 stream 的上下文中插入一个 Presence 元素，来表明自身的状态。要想接受 presence 消息，必须经过一个叫做 presence subscription 的授权过程。</p>
+<ul>
+<li>type: 非必须<br/><ul>
+<li>subscribe：订阅其他用户的状态</li>
+<li>probe：请求获取其他用户的状态</li>
+<li>unavailable：不可用，offline</li>
+</ul>
+</li>
+<li>show: 用户当前状态<ul>
+<li>chat：聊天中</li>
+<li>away：暂离</li>
+<li>xa：eXtend Away，长时间离开</li>
+<li>dnd：请勿打扰</li>
+</ul>
+</li>
+<li>status：自由文本，即 rich presence 或 extended presence</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">presence</span> <span class="attr">from</span>=<span class="string">&#x27;nobody@caoyue.me/test&#x27;</span> <span class="attr">xml:lang</span>=<span class="string">&#x27;en&#x27;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">show</span>&gt;</span>dnd<span class="tag">&lt;/<span class="name">show</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">status</span>&gt;</span>Busy!<span class="tag">&lt;/<span class="name">status</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">presence</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>IQ (Info&#x2F;Query)<br>请求／响应消息，如获取用户的好友列表。</p>
+<ul>
+<li>type:<ul>
+<li>get: 获取一个值</li>
+<li>set: 设置或替换 get 查询的值</li>
+<li>result: 服务器响应了先前的查询，返回结果如好友列表</li>
+<li>error: 请求或响应出现错误</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">from</span>=<span class="string">&#x27;nobody@caoyue.me/test&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">id</span>=<span class="string">&#x27;xxxxxx&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">to</span>=<span class="string">&#x27;test&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">type</span>=<span class="string">&#x27;subscribe&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ping</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:xmpp:ping&#x27;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">iq</span> <span class="attr">from</span>=<span class="string">&#x27;test&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">id</span>=<span class="string">&#x27;xxxxxx&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">to</span>=<span class="string">&#x27;nobody@caoyue.me/test&#x27;</span></span></span><br><span class="line"><span class="tag">   <span class="attr">type</span>=<span class="string">&#x27;error&#x27;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">error</span> <span class="attr">type</span>=<span class="string">&#x27;modify&#x27;</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">bad-request</span> <span class="attr">xmlns</span>=<span class="string">&#x27;urn:ietf:params:xml:ns:xmpp-stanzas&#x27;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">error</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">iq</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>Ref:<br>[1] <a target="_blank" rel="noopener" href="http://xmpp.org/rfcs/rfc6120.html">http://xmpp.org/rfcs/rfc6120.html</a><br>[2] <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/XMPP">http://en.wikipedia.org/wiki/XMPP</a></p>
+</div><div><ul class="info"><li>2014-08-05</li><li><a href="/tags/ejabberd/">#ejabberd</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/thoughts-on-erlang-ejabberd/">Thoughts on Erlang and ejabberd</a></div><div class="content"><p>分析 WhatsApp 架构的时候提到了他们使用的 Erlang + ejabberd 架构。看起来非常神奇，但感觉想要直接搬过来也有一些问题。</p>
+<h3 id="Erlang"><a href="#Erlang" class="headerlink" title="Erlang"></a>Erlang</h3><ul>
+<li>优秀的工程师<br/><br>Erlang 看起来语法简单、函数式编程、并发能力强，但就是——会的人太少了，连 Facebook 都找不到足够的优秀 Erlang 程序员，这是为什么呢……反正我们 HR 表示目前连投简历的人都没有 XD</li>
+<li>语言本身<br/><br>刚接触 Erlang，只能说下初步的感受，也有可能是见识不及，权当一看。<ul>
+<li>语法简单，特性少。很难说到底是优点还是缺点。Erlang 的语法可能一页纸就能写完。但是带来的是「我应该怎么开始？」这样的问题</li>
+<li>学习成本。无论鼓吹者宣扬函数式多么好，语言始终是用来解决问题的。Java 再烂依然大把公司用得很 happy 。大部分程序员是务实的，只有能带来好处才会去原因学习。但是对习惯了面向对象命令式编程的程序员来说，学习和思维转换的成本可能根本比带来的好处要大得多。Golang 比 Erlang 火不是没有理由的</li>
+<li>数据类型。比如不存在字符串而是使用 List ，不管从性能或是直觉上来说，总觉得有那么点奇怪</li>
+<li>数据抽象能力。用 Erlang 开发的复杂应用实在看得头疼，数据抽象能力弱好处是灵活，但导致的后果就是代码里到处充斥着不知道意义的 tuple 和 record，它们之间可能还层层嵌套，让我感觉脑子时刻准备 StackOverflow</li>
+<li>和其他语言的交互。Erlang 处处透露着一股高冷范儿，比如独特的错误恢复机制，自实现的进程等等，很难做到和其他语言合群。但是在自己的领域里，Erlang 做得足够好。</li>
+</ul>
+</li>
+</ul>
+<h3 id="XMPP-协议"><a href="#XMPP-协议" class="headerlink" title="XMPP 协议"></a>XMPP 协议</h3><ul>
+<li>XMPP 协议实在是太「重」了！XMPP 协议基于 XML ，很大的问题是信息冗余太大，传输数据的很大部分（一般超过 60%）是协议相关，其中既有协议本身繁冗的关系，也有 XML 的原因。<br>对<strong>移动设备</strong>来说这将是个很大的问题——更多的流量消耗、以及相关的电量、网络效率等等。</li>
+<li>XMPP 协议的另一个问题在于扩展的复杂。XMPP 协议本身已经定义了一大堆协议流程，如果想要在基础之上扩展，将会非常麻烦。<br>基本上使用 XMPP 协议的服务最后都会改换成自定义协议（比如 WhatsApp），也不是没有原因的。</li>
+</ul>
+<p>想要快速开发 Erlang + ejabberd 还是不错的，XMPP 协议本身很开放和完善，各种平台的实现也很多，用来快速原型还是不错的。但是想要实现深度的定制和优化可能就需要更多的时间和精力了，尤其对于移动平台来说。</p>
+</div><div><ul class="info"><li>2014-08-03</li><li><a href="/tags/erlang/">#erlang</a></li><li><a href="/tags/ejabberd/">#ejabberd</a></li></ul></div></div><div class="pager"><a class="pre" href="/page/4/">Previous</a>   <a class="next" href="/page/6/">Next</a></div></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

@@ -1,0 +1,253 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry"><div class="title"><a href="/post/joe-armstrong-and-erlang/">Joe Armstrong and Erlang</a></div><div class="content"><p>无意中翻到 Joe Armstrong 发在 erlang-questions 里的文章，<a target="_blank" rel="noopener" href="http://erlang.org/pipermail/erlang-questions/2011-July/059965.html">Ways to get started</a> 以及 <a target="_blank" rel="noopener" href="http://erlang.org/pipermail/erlang-questions/2013-January/071944.html">history of erlang</a>。<br>如果你不知道 Joe Armstrong 是谁，我们给他的另一个称呼是 the father of Erlang :)<br>大概没有人比他更有资格写这种文章了吧。<br>在高手眼中大道至简，我们不一定学的来，但是听听还是很有启发的</p>
+<p>随便瞎扯几句</p>
+<h4 id="忘掉工具"><a href="#忘掉工具" class="headerlink" title="忘掉工具"></a>忘掉工具</h4><blockquote>
+<p>Forget about git&#x2F;IDEs&#x2F;rebar etc.<br>Forget about the tools</p>
+</blockquote>
+<p>如果没有 IDE，没有自动打包工具，我们怎么编写和运行代码？<br>记住，shell 和文本编辑器对任何语言都是适用的。<br>当然我并不觉得这意味着需要放弃 IDE 之类的工具，而是在 get started 的时候，对程序怎么工作的有基本的了解是有好处的。<br>某种意义上来说，过于复杂的工具链意味着，一旦它没有按照你想象的运行，就需要花费更多的时间去解决它。</p>
+<ul>
+<li>rebar!<br/><br>当然，不能忘了 rebar!<br>事实上 rebar 已经快要成为 erlang project 的标配了。</li>
+</ul>
+<blockquote>
+<p>Tools like rebar etc are under to automate something but if you don’t<br>know what it is that you are automating and if the tool doesn’t work<br>you will just end up being incredible confused.</p>
+</blockquote>
+<p>「像 rebar 这样的工具会自动生成一些东西，但如果你不知道自动生成了什么，如果这些工具无法使用了，你将会变得困惑不已。」<br>说得好！<br>但是在更好的解决办法出现之前，也只能这么用了，寄希望于 OTP 组的改进吧，这一块也是我最不喜欢 erlang 的地方。</p>
+<h4 id="黑"><a href="#黑" class="headerlink" title="黑"></a>黑</h4><p>我一直觉得好的语言应该是某种程度上符合直觉的。这种直觉也许来自逻辑也许来自经验。<br>比如 erlang。<br>要举个反例也很容易，比如「世界上最好的语言」。<br>Joe Armstrong 是这么不经意的黑</p>
+<blockquote>
+<p>Notice there is no quick fix here - if you want a quick fix go buy<br>“learn PHP in ten minutes”<br>and spend the next twenty years googling for<br>“how do I compute the length of a string”</p>
+</blockquote>
+<p>hmm, well done!</p>
+<h4 id="the-father-of-Erlang"><a href="#the-father-of-Erlang" class="headerlink" title="the father of Erlang"></a>the father of Erlang</h4><p>Joe Armstrong 是个有趣的老头，也是真正的大师，推荐他的 <a target="_blank" rel="noopener" href="http://joearms.github.io/">blog</a>，内容远远不止 erlang，可以看他讲讲信手拈来言简意赅的道理，喜欢八卦的话可以看他学 js 顺手黑黑其他语言 :)<br>以及他的 twitter <a target="_blank" rel="noopener" href="https://twitter.com/joeerl">@joeerl</a></p>
+<p>最后是一段以前放在 erlang.org 上的话，如果学完 erlang 你还不懂这段话，可能你需要从头再来一遍 :)</p>
+<blockquote>
+<p>The world is concurrent.<br>Things in the world don’t share data.<br>Things communicate with messages.<br>Things fail.<br>                      - Joe Armstrong</p>
+</blockquote>
+<p>btw，Joe Armstrong 的邮箱地址是 erlang#gmail.com，是不是比 「I Wrote Python」 低调多了 :)</p>
+</div><div><ul class="info"><li>2015-08-21</li><li><a href="/tags/erlang/">#erlang</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/rename-user-folder-in-windows-10/">重命名 Windows 10 账户文件夹</a></div><div class="content"><p>升级到 Windows 10 之后，很糟心的是通过 Microsoft Account 登录的时候，默认创建的账户文件夹居然不是 Microsoft Account 的 name，明明是 <a href="mailto:&#110;&#105;&#99;&#107;&#64;&#111;&#117;&#x74;&#108;&#x6f;&#111;&#x6b;&#x2e;&#99;&#x6f;&#109;">&#110;&#105;&#99;&#107;&#64;&#111;&#117;&#x74;&#108;&#x6f;&#111;&#x6b;&#x2e;&#99;&#x6f;&#109;</a>，结果创建出来的却是 nic …… 完全不知道这帮人怎么做到的 &#x3D;-&#x3D;<br>不管有没有强迫症，每次看到这个错的名字都实在不能忍，找到个修改的方法<br>参考了来自 superuser 的解决方法，原文针对的是 Windows 8，不过对 Windows 10 依然有效<br>原文地址 <a target="_blank" rel="noopener" href="http://superuser.com/questions/495290/how-to-rename-user-folder-in-windows-8">http://superuser.com/questions/495290/how-to-rename-user-folder-in-windows-8</a></p>
+<p>步骤如下：</p>
+<ul>
+<li>用 nic 代表原来的账户名</li>
+<li>用 nick 代表新的账户名</li>
+<li>下面的操作中用你自己的需求替换 nic 和 nick</li>
+</ul>
+<h4 id="1-创建一个本地管理员账户"><a href="#1-创建一个本地管理员账户" class="headerlink" title="1. 创建一个本地管理员账户"></a>1. 创建一个本地管理员账户</h4><p>Windows 10 中创建本地账户的选项藏得更深了，可以按如下方法操作</p>
+<ul>
+<li>打开 <code>Setting</code></li>
+<li>找到 <code>Family &amp; other users</code></li>
+<li>点击 <code>Add someone else to this PC</code></li>
+<li>弹出添加对话框，选择下面的 <code>the person I want to add doesn&#39;t have an email address</code></li>
+<li>继续选择 <code>Add a user without a Microsoft Account</code></li>
+<li>填写用户名密码，创建本地账户</li>
+<li>点击创建的用户，<code>Change Account Type</code> 为 <code>Administrator</code></li>
+</ul>
+<h4 id="2-重命名账户名称"><a href="#2-重命名账户名称" class="headerlink" title="2. 重命名账户名称"></a>2. 重命名账户名称</h4><ul>
+<li>退出当前账户，登录刚才创建的本地账户</li>
+<li>打开 <code>Computer Management</code>，快捷键 <code>Win + X, G</code></li>
+<li>打开 <code>System Tools</code></li>
+<li>找到 <code>Local Users and Groups</code></li>
+<li>打开 <code>Users</code>，找到需要修改的用户 <code>nic</code></li>
+<li>右键点击，<code>Rename</code>，修改为你想要的 <code>nick</code></li>
+</ul>
+<h4 id="3-重命名账户文件夹"><a href="#3-重命名账户文件夹" class="headerlink" title="3. 重命名账户文件夹"></a>3. 重命名账户文件夹</h4><ul>
+<li>打开管理员权限的 Cmd，快捷键 <code>Win + X, A</code></li>
+<li>输入 <code>ren C:\Users\nic nick</code></li>
+</ul>
+<h4 id="4-修改注册表关联"><a href="#4-修改注册表关联" class="headerlink" title="4. 修改注册表关联"></a>4. 修改注册表关联</h4><ul>
+<li>打开注册表编辑器，快捷键 <code>Win + X, R</code> 打开<code>运行</code>，然后输入 <code>regedit</code> 回车</li>
+<li>找到 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\</code></li>
+<li>一个个点开所有以 <code>S-1-5</code> 类似的字符开头的键，查看 <code>ProfileImagePath</code></li>
+<li><code>ProfileImagePath</code> 值为 <code>C:\Users\nic</code> 的就是我们需要修改的账户，点击它，修改为 <code>C:\Users\nick</code></li>
+</ul>
+<h4 id="5-重新登录"><a href="#5-重新登录" class="headerlink" title="5. 重新登录"></a>5. 重新登录</h4><ul>
+<li>使用原来的 Microsoft Acount 登录原先的账号</li>
+<li>确定一切正常，账户文件夹也已经修改成功</li>
+<li>可以删除创建的本地账户了</li>
+</ul>
+<p>hope it’s helpful.</p>
+</div><div><ul class="info"><li>2015-08-01</li><li><a href="/tags/life/">#life</a></li><li><a href="/tags/windows/">#windows</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/xmpp-security/">XMPP 安全相关</a></div><div class="content"><p>最近又从头看 XMPP 的 RFC[^1]，有时候也考虑如果是自己来设计，会如何做。<br>之前的印象是 XMPP 的繁琐和低效，现在看来，作为通用的协议，XMPP 确实有做得不错的地方，从头看下来还是有不少收获的。</p>
+<p>现在项目告一段落，回头整理下 XMPP 服务端安全方面的一些简单想法，大概想到哪写到哪吧，安全方面懂得不多，欢迎指正。<br>考虑到安全，我们的初始目标大概包括这些：</p>
+<ul>
+<li>与服务端通信安全（不被窃听&#x2F;篡改）</li>
+<li>鉴别用户身份</li>
+<li>保护用户数据</li>
+</ul>
+<h4 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h4><p>TLS[^2] 用于在两个通信应用程序之间提供保密性和数据完整性，是必须开启的。</p>
+<h4 id="SASL"><a href="#SASL" class="headerlink" title="SASL"></a>SASL</h4><p>SASL[^3] 是一种验证用户身份的框架。XMPP 本身没有办法分辨用户身份，必须借助于 SASL 协议。<br>SASL 协议确定了客户端和服务端沟通的应答机制及传输的编码方法，剩下的就需要自己实现了。<br>要识别用户身份，你需要在 SASL 的框架下定义和服务端交换的具体身份信息（比如用户名、密码），以及实现身份信息的存储和验证方式，而不需要考虑其他细节。<br>具体到 XMPP 下 SASL 的验证流程（如果建立了 TLS 连接，此时是在 TLS 连接上的）：<br>一般不必支持所有的 SASL mechanisms ，选择安全性更可靠的，比如 <code>SCRAM-SHA-1</code> (尽量不要使用 plain)：</p>
+<p>详细登录流程可以参考 <a href="http://blog.caoyue.me/post/ejabberd-login">ejabberd: Login</a></p>
+<h4 id="SCRAM-SHA-1"><a href="#SCRAM-SHA-1" class="headerlink" title="SCRAM-SHA-1"></a>SCRAM-SHA-1</h4><p><code>SCRAM</code>[^4]（Salted Challenge Response Authentication Mechanism） 是近年才开始使用的更安全的一种加密验证机制，可以很好的在 Server 和 Client 之间做双向的验证，已经有很多的服务开始使用这种方式验证了，比如 MongoDB。XMPP 也在协议中提供了这种方式的说明。<br>不讨论详细的加密算法细节，客户端验证登录时，大概流程如下：</p>
+<ol>
+<li>client 发送想要登录的 username 到 server (即 auth)</li>
+<li>server 为该 username 生成&#x2F;查找出 salt（s)，和 iteration count（i）、server nonce (r) 一并发回给 client （challenge，base64 编码）</li>
+<li>client 使用给定的 salt 和 iteration count 加密持有的 password，发回给 server （如果服务端对该 client 使用的 salt 和 iteration count 是固定的话，可以存储下生成的 client key，从而避免在 client 明文存储密码，会更安全）</li>
+<li>server 验证结果，如果成功则返回 success，并附上计算值</li>
+<li>client 校验 success 中返回的值，通过则证明 server 拥有 client 的验证</li>
+</ol>
+<h4 id="end-to-end"><a href="#end-to-end" class="headerlink" title="end_to_end"></a>end_to_end</h4><p>如果有非常严格的安全需求，可以考虑 OpenPGP ，XMPP 协议也提供了有限的支持<br>不过我个人觉得这种方法也不是那么完美：</p>
+<ul>
+<li>需要额外的交换 key 的渠道，而这些渠道不一定可信</li>
+<li>杜绝不了伪造身份，你没法确定 id 对应的绑定的就一定是 key 的拥有者</li>
+<li>信息冗长，加密的信息可能字节数会扩大到 10 倍甚至以上</li>
+</ul>
+<h4 id="文件服务"><a href="#文件服务" class="headerlink" title="文件服务"></a>文件服务</h4><p>文件传输基本是现在 IM 客户端的基础功能了。<br>一般我们不会选择通过文本方式直接在消息中发送文件&#x2F;图片，而是选择先上传到 HTTP 文件服务器，然后发送链接的形式。但是 HTTP 是无状态的，我们也不能每次在用户对资源操作的时候要求用户输入用户名密码。</p>
+<p>首先考虑上传：</p>
+<ul>
+<li>上传通道泄露可能会带来滥用</li>
+<li>AWS 可以使用 key 和 secret 校验上传请求</li>
+<li>将 secret key 存放在客户端可能被逆向</li>
+<li>XMPP 服务端可以看作可信的已鉴权服务</li>
+</ul>
+<p>所以可以考虑这样操作：</p>
+<ul>
+<li>已鉴权的客户端从 XMPP 服务端申请上传</li>
+<li>文件服务器生成一个上传用的 token，生成方式可能是<br><code>token = hash(user + id + nonce + expire_stamp + secret)</code></li>
+<li>XMPP 服务端从文件服务器获取生成的 token 并返回给客户端（假设 XMPP 服务端与文件服务器之间的通信是可信的，比如处于同一个内网。当然也可以 XMPP 服务端使用同样的 secret 和算法来计算 token 而不请求文件服务器）</li>
+<li>客户端向文件服务器提交上传请求，并带上 <code>token, user, id, expire_stamp, nonce</code></li>
+<li>文件服务器校验是否过期以及<br><code>hash(user + id + nonce + expire_stamp + secret) == token</code></li>
+<li>校验通过，上传文件到 AWS S3 或其他存储服务，返回文件 id 给客户端</li>
+</ul>
+<p>然后是下载：<br>出于安全考虑，我们通常不会允许固定的 url 访问，而是通过增加验证和过期的方式来做一些限制。<br>一方面防止文件抓取，同时降低私密文件意外公开的风险，甚至可以通过更换 secret key，让公开的链接失效，强制客户端重新向服务端请求鉴权。<br>和上传文件类似：</p>
+<ul>
+<li>客户端提交请求的文件 id 给 XMPP 服务端-</li>
+<li>XMPP 服务端用类似的方式生成一个 token 返回给客户端</li>
+<li>客户端使用链接 + token 的形式访问文件资源</li>
+<li>文件服务器校验 token, 以及是否过期等等，通过则返回资源</li>
+</ul>
+<p>当然现实情况可能用不到复杂的机制，也可以根据情况适当放松要求。<br>btw, 至少我抓包验证不止一个重量级的 App 使用的就是类似于 <code>http://xxxxx/uuid</code> 的永久文件地址&#x3D; &#x3D;。</p>
+<h4 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h4><p>即使在完善的安全机制下，也<strong>不要完全信任用户的输入</strong>！<br>不像网页上按按 F12 就可以拿到很多信息，可能移动设备给人一种难以 hack 的错觉，但是决定有没有人来搞的是值不值得，还有运气 :)</p>
+<p>[^1]: [1] <a target="_blank" rel="noopener" href="http://xmpp.org/xmpp-protocols/internet-drafts/">http://xmpp.org/xmpp-protocols/internet-drafts/</a><br>[^2]: [2] <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Transport_Layer_Security">https://en.wikipedia.org/wiki/Transport_Layer_Security</a><br>[^3]: [3] <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer">https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer</a><br>[^4]: [4] <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism">https://en.wikipedia.org/wiki/Salted_Challenge_Response_Authentication_Mechanism</a></p>
+</div><div><ul class="info"><li>2015-07-07</li><li><a href="/tags/xmpp/">#xmpp</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/if-csharp-support-void-generic-parameter/">如果 C# 支持 void 作为泛型参数</a></div><div class="content"><h4 id="有些问题可能看起来无所谓，但是开开脑洞还是挺有意思的"><a href="#有些问题可能看起来无所谓，但是开开脑洞还是挺有意思的" class="headerlink" title="有些问题可能看起来无所谓，但是开开脑洞还是挺有意思的"></a>有些问题可能看起来无所谓，但是开开脑洞还是挺有意思的</h4><p>比如，最近碰到一个问题，简化形式是这样的：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">IEnumerable&lt;<span class="built_in">int</span>&gt; <span class="title">Range</span>(<span class="params"><span class="built_in">int</span> n</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt;= n) &#123;</span><br><span class="line">        <span class="comment">// DoSomething1...</span></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> i;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Range(n).ForEach(x =&gt; DoSomething2(x));</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">DoSomething2</span>(<span class="params">x</span>)</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="看出问题了么？"><a href="#看出问题了么？" class="headerlink" title="看出问题了么？"></a>看出问题了么？</h4><ul>
+<li><p><code>IEnumerable</code> 接口是没有 <code>ForEach</code> 方法的，<code>ForEach</code> 是 <code>List&lt;T&gt;</code> 的方法，所以只能写成</p>
+<pre><code><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enumerable.Range(<span class="number">0</span>, n).ToList().ForEach(x =&gt; DoSomething(x));</span><br></pre></td></tr></table></figure>
+</code></pre>
+<p>但是显然这样就失去了延迟执行的意义了</p>
+</li>
+<li><p>我们也可以尝试使用 <code>IEnumerable</code> 的 <code>Select</code> 方法，变成这样：</p>
+<pre><code><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enumerable.Range(<span class="number">0</span>, n).Select(x =&gt; DoSomething2(x));</span><br></pre></td></tr></table></figure>
+</code></pre>
+<p>当然这样也行不通，因为我们的 <code>DoSomething2</code> 方法是 <code>void</code> 类型的</p>
+</li>
+<li><p>最后只能粗暴的给 <code>DoSomething2</code> 包装一个返回值</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enumerable.Range(<span class="number">0</span>, n).Select(x =&gt; &#123; DoSomething2(x); <span class="keyword">return</span> <span class="literal">true</span>; &#125;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="如果-IEnumerable-支持-ForEach-方法就好了？"><a href="#如果-IEnumerable-支持-ForEach-方法就好了？" class="headerlink" title="如果 IEnumerable 支持 ForEach 方法就好了？"></a>如果 <code>IEnumerable</code> 支持 <code>ForEach</code> 方法就好了？</h4><ul>
+<li>事实上 C# 设计者对此作了解释：<a target="_blank" rel="noopener" href="http://blogs.msdn.com/b/ericlippert/archive/2009/05/18/foreach-vs-foreach.aspx">“foreach” vs “ForEach”</a></li>
+<li>总之来说，<code>List&lt;T&gt;.ForEach</code> 是 <code>List&lt;T&gt;</code> 本身的方法， Linq 不会提供有副作用的方法，它违反了 Linq <code>side-effect-free</code> 的设计理念</li>
+<li>Mmm，听起来好像很有道理 :(</li>
+</ul>
+<p>当然，这个例子本身不具有太大的意义，但是——</p>
+<h4 id="不妨开个脑洞"><a href="#不妨开个脑洞" class="headerlink" title="不妨开个脑洞"></a>不妨开个脑洞</h4><p>如果可以用 <code>void</code> 作为泛型参数呢？</p>
+<ul>
+<li><p>这样的代码不再有问题了</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enumerable.Range(<span class="number">0</span>, n).Select&lt;<span class="built_in">int</span>, <span class="keyword">void</span>&gt;(x =&gt; DoSomething2(x));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>也并没有违反 Linq 的设计理念（当然，取决于你怎么看了 :(</p>
+</li>
+<li><p>更大的好处在于：<br>如果把 <code>void</code> 看作泛型的一种，可以在不增加复杂度的前提下简化一些问题<br>比如<strong>不需要为 <code>MyClass</code> 和 <code>MyClass&lt;T&gt;</code> 写两次相同的代码了</strong><br>因为 <code>MyClass</code> 就相当于 <code>MyClass&lt;void&gt;</code>，我们可以统一所有处理逻辑，不再需要大堆的重载了。</p>
+</li>
+</ul>
+<hr>
+<p>搜索的时候发现有很多大牛讨论过这个问题了，受益匪浅<br>比如 <a target="_blank" rel="noopener" href="http://blog.zhaojie.me/2012/05/csharp-design-flaws-2-cannot-use-void-as-generic-type-parameter.html">C#的设计缺陷（2）：不能以 void 作为泛型参数</a></p>
+</div><div><ul class="info"><li>2015-06-26</li><li><a href="/tags/csharp/">#csharp</a></li><li><a href="/tags/programming/">#programming</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/about-erlang-records/">About Erlang: Records</a></div><div class="content"><h4 id="1-tuple-and-record"><a href="#1-tuple-and-record" class="headerlink" title="1. tuple and record"></a>1. tuple and record</h4><p>现在有一些键值对，它们和给定 record 的项一一对应，如何转换成 record?</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">-record</span><span class="params">(test, &#123;</span></span><br><span class="line"><span class="params">    a::binary(),</span></span><br><span class="line"><span class="params">    b::binary()</span></span><br><span class="line"><span class="params">&#125;)</span>.</span><br><span class="line"></span><br><span class="line">KeyValuePairs = [&#123;a, &lt;&lt;<span class="string">&quot;a&quot;</span>&gt;&gt;&#125;,&#123;b, &lt;&lt;<span class="string">&quot;b&quot;</span>&gt;&gt;&#125;].</span><br></pre></td></tr></table></figure>
+
+<p>很基础的问题，我们这样做：</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Result = #test&#123;</span><br><span class="line">    a = get_value(a, KeyValuePairs),</span><br><span class="line">    b = get_value(a, KeyValuePairs)</span><br><span class="line">&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>如果 record 有一百个项呢？<br>重复的写 <code>a = get_value(a, KeyValuePairs)</code> 这样的代码一百次大概会让人怀疑「猿」生吧 :(</p>
+<p>虽然 Erlang 并没有提供动态生成 record 的方法，但是我们知道</p>
+<ul>
+<li><strong>Erlang 的 record 实际上是用 tuple 来表示的</strong>，即 <code>#test&#123;a = &lt;&lt;&quot;a&quot;&gt;&gt;, b = &lt;&lt;&quot;b&quot;&gt;&gt;&#125;</code> 实际上是 <code>&#123;test, &lt;&lt;&quot;a&quot;&gt;&gt;, &lt;&lt;&quot;b&quot;&gt;&gt;&#125;</code></li>
+<li><strong>所有在运行时对 record 的操作实际上都是对 tuple 的操作</strong></li>
+<li><code>Result#test.a</code> 实际上是 tuple 的 index</li>
+<li>可以使用 <code>record_info(fields, record)</code> 获取 Record 的 fields 信息</li>
+</ul>
+<p>所以我们可以这样</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Result = list_to_tuple([test |</span><br><span class="line">    [get_value(X, KeyValuePairs) || X &lt;- record_info(fields, test)]]).</span><br><span class="line"></span><br><span class="line">Result#test.a.</span><br><span class="line"><span class="comment">%% &lt;&lt;&quot;a&quot;&gt;&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-record-info"><a href="#2-record-info" class="headerlink" title="2. record_info"></a>2. record_info</h4><p>很容易想到，我们要是把处理函数抽象出来，不是多了一个 <code>kvpairs_to_record</code> 的接口了么？</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">-spec</span> kvpairs_to_record<span class="params">(kvpairs(), atom())</span> -&gt; rec<span class="params">()</span>.</span><br><span class="line"><span class="function"><span class="title">kvpairs_to_record</span><span class="params">(KeyValuePairs, Record)</span> -&gt;</span></span><br><span class="line">	list_to_tuple([Record |</span><br><span class="line">        [get_value(X, KeyValuePairs) || X &lt;- record_info(fields, Record)]]).</span><br></pre></td></tr></table></figure>
+
+<p>很遗憾，行不通。编译的时候会报出 <code>illegal record info</code> 错误。</p>
+<p>WTF?</p>
+<ul>
+<li><code>record_info</code> 并不是一个通常意义上的 BIF，它不能接受变量</li>
+<li>其原因在于 record structure 只存在于编译期，<strong>在运行时是不可见的</strong>，编译完成后，record 就已经被表示成为 tuple 了，自然没有办法在运行时再获取 record info 了</li>
+</ul>
+<p>所以你只能这么「曲线救国」了</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">kvpairs_to_record</span><span class="params">(KeyValuePairs, Record, RecordInfo)</span> -&gt;</span></span><br><span class="line">	list_to_tuple([Record | [get_value(X, KeyValuePairs) || X &lt;- RecordInfo]]).</span><br><span class="line"></span><br><span class="line">Result = kvpairs_to_record(KeyValuePairs, test, record_info(fields, test)).</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-macro-and-record"><a href="#3-macro-and-record" class="headerlink" title="3. macro and record"></a>3. macro and record</h4><p>所以就这样放弃了？<br>当然不，为了「代码洁癖」我们可以「不择手段」。<br>考虑到 define macro 也是编译期的，我们可以这样 trick</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">-module</span><span class="params">(test)</span>.</span><br><span class="line"><span class="keyword">-export</span><span class="params">([do/<span class="number">0</span>])</span>.</span><br><span class="line"></span><br><span class="line"><span class="keyword">-define</span><span class="params">(fuxk(Record, Val),</span></span><br><span class="line"><span class="params">    <span class="keyword">fun</span>() -&gt;</span></span><br><span class="line"><span class="params">        list_to_tuple([Record | [get(X, Val)</span></span><br><span class="line"><span class="params">            || X &lt;- record_info(fields, Record)]])</span></span><br><span class="line"><span class="params">    <span class="keyword">end</span></span></span><br><span class="line"><span class="params">)</span>.</span><br><span class="line"></span><br><span class="line"><span class="keyword">-record</span><span class="params">(test, &#123;</span></span><br><span class="line"><span class="params">    a :: binary(),</span></span><br><span class="line"><span class="params">    b :: binary()</span></span><br><span class="line"><span class="params">&#125;)</span>.</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">do</span><span class="params">()</span> -&gt;</span></span><br><span class="line">    KV = [&#123;a, &lt;&lt;<span class="string">&quot;a&quot;</span>&gt;&gt;&#125;,&#123;b, &lt;&lt;<span class="string">&quot;b&quot;</span>&gt;&gt;&#125;],</span><br><span class="line">    Result = ?fuxk(test, KV)(),</span><br><span class="line">    Result#test.a.</span><br><span class="line">    <span class="comment">% &lt;&lt;&quot;a&quot;&gt;&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">get</span><span class="params">(Key, KeyValuePairs)</span> -&gt;</span></span><br><span class="line">    proplists:get_value(Key, KeyValuePairs, undefined).</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Goodness gracious - it works!</p>
+<h4 id="4-beam-and-record"><a href="#4-beam-and-record" class="headerlink" title="4. beam and record"></a>4. beam and record</h4><p>当然像上面那样写实际上也没有好多少，依然还是不完美。<br>如果一定需要在运行时得到 record info 呢？<br>比如我们热升级代码，需要更新 record 定义怎么办？</p>
+<p>幸好，record structure 会被写入到 beam 中，我们只需要 load beam 然后解析它，还是可以达到运行时获取 record info 的效果的。<br>具体实现可以参考 <a target="_blank" rel="noopener" href="https://github.com/esl/parse_trans">https://github.com/esl/parse_trans</a></p>
+<p>当然，除非知道自己在做什么，否则<strong>不推荐</strong>这么做。</p>
+<h4 id="5-最后"><a href="#5-最后" class="headerlink" title="5. 最后"></a>5. 最后</h4><p>实际上我很好奇为什么 Erlang 不提供运行时访问 record structure 呢？信息已经存在于 beam 中了，实现一下不难吧。<br>最后，如果不需要考虑兼容，**推荐使用 <code>map</code> 来替代 <code>record</code>**，<code>map</code> 在运行时数据结构可见并且可以增删成员。</p>
+</div><div><ul class="info"><li>2015-05-27</li><li><a href="/tags/programming/">#programming</a></li><li><a href="/tags/erlang/">#erlang</a></li></ul></div></div><div class="entry"><div class="title"><a href="/post/mptt-tree/">预排序遍历算法树</a></div><div class="content"><p><img src="http://ww2.sinaimg.cn/large/3e69b0ccgw1et1gl2lw6wj20o20d30ti.jpg" alt="mptt"></p>
+<h4 id="1-预排序遍历树算法"><a href="#1-预排序遍历树算法" class="headerlink" title="1. 预排序遍历树算法"></a>1. 预排序遍历树算法</h4><ul>
+<li>mptt (Modified Preorder Tree Traversal)[^1]</li>
+<li>优点<br>查询效率高，只需要一次查询即可获得层级结构中某个节点的所有子节点，无需递归查询</li>
+<li>缺点<br>插入、删除、移动节点效率较低</li>
+<li>适用<br>在传统关系数据库中实现层级树结构<ul>
+<li>读压力 &gt; 写压力， mptt 算法可以提高效率</li>
+<li>写压力 &gt; 读压力，使用传统的邻接表 (adjacency list model)</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-增删查改"><a href="#2-增删查改" class="headerlink" title="2. 增删查改"></a>2. 增删查改</h4><ul>
+<li><p>Create</p>
+<ul>
+<li>假设增加的节点为 <code>c</code>, 该节点前一节点为 <code>p</code></li>
+<li>节点 <code>c</code> 左值为 <code>p</code> 的右值 <code>+1</code>，右值为 <code>p</code> 右值 <code>+2</code></li>
+<li>所有左值大于节点 <code>c</code> 的左值的节点，其左值均 <code>+2</code></li>
+<li>所有右值大于节点 <code>c</code> 的右值的节点，其右值均 <code>+2</code></li>
+<li>写入节点 <code>c</code> 到数据库</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="variable">@cRight</span> :<span class="operator">=</span> rgt <span class="keyword">FROM</span> mptt	<span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;p&#x27;</span>;</span><br><span class="line">UPDATE mptt <span class="keyword">SET</span> rgt <span class="operator">=</span> rgt <span class="operator">+</span> <span class="number">2</span> <span class="keyword">WHERE</span> rgt <span class="operator">&gt;</span> <span class="variable">@cRight</span> ;</span><br><span class="line">UPDATE mptt <span class="keyword">SET</span> lft <span class="operator">=</span> lft <span class="operator">+</span> <span class="number">2</span> <span class="keyword">WHERE</span> lft <span class="operator">&gt;</span> <span class="variable">@cRight</span> ;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> mptt(name, lft, rgt) <span class="keyword">VALUES</span>(<span class="string">&#x27;c&#x27;</span>, <span class="variable">@cRight</span><span class="operator">+</span> <span class="number">1</span>, <span class="variable">@cRight</span><span class="operator">+</span> <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Read</p>
+<ul>
+<li><p>查询节点 <code>c</code> 的子节点：</p>
+<ul>
+<li><p>查询所有左值大于 <code>c</code> 的左值且右值小于 <code>c</code> 的右值的节点</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> mptt <span class="keyword">WHERE</span> lft <span class="keyword">BETWEEN</span> <span class="variable">@cLeft</span> <span class="keyword">and</span> <span class="variable">@cRight</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>查询节点 <code>c</code> 的父节点：</p>
+<ul>
+<li><p>查询所有左值小于 <code>c</code> 的左值且右值大于 <code>c</code> 的右值(或左值)的节点</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> mptt <span class="keyword">WHERE</span> lft <span class="operator">&lt;</span> <span class="variable">@cLeft</span> <span class="keyword">and</span> rgt <span class="operator">&gt;</span> <span class="variable">@cLeft</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>节点 <code>c</code> 的子节点个数：</p>
+<ul>
+<li><code>(c.right - c.left - 1) / 2</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Update<br>移动节点即：</p>
+<ul>
+<li>删除节点</li>
+<li>在指定位置新增节点</li>
+</ul>
+</li>
+<li><p>Delete</p>
+<ul>
+<li>删除节点 <code>c</code></li>
+<li>所有右值大于 <code>c</code> 右值的节点，右值 <code>-2</code></li>
+<li>所有左值大于 <code>c</code> 左值的节点，左值 <code>-2</code></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> mptty <span class="keyword">WHERE</span> lft <span class="keyword">BETWEEN</span> <span class="variable">@cLeft</span> <span class="keyword">AND</span> <span class="variable">@cRight</span>;</span><br><span class="line">UPDATE mptt <span class="keyword">SET</span> rgt <span class="operator">=</span> rgt <span class="operator">-</span> <span class="number">2</span> <span class="keyword">WHERE</span> rgt <span class="operator">&gt;</span> <span class="variable">@cRight</span>;</span><br><span class="line">UPDATE mptt <span class="keyword">SET</span> lft <span class="operator">=</span> lft <span class="operator">-</span> <span class="number">2</span> <span class="keyword">WHERE</span> lft <span class="operator">&gt;</span> <span class="variable">@cLeft</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-重建树结构"><a href="#3-重建树结构" class="headerlink" title="3. 重建树结构"></a>3. 重建树结构</h4><p>很容易推断，对排序好的 mptt tree，仅需要一次遍历，即可根据所有节点的左右值记录重建树结构<br>以 python 为例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Node class</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, left, right</span>):</span></span><br><span class="line">        <span class="built_in">super</span>(Node, self).__init__()</span><br><span class="line">        self.left = left</span><br><span class="line">        self.right = right</span><br><span class="line">        self.depth = <span class="number">1</span></span><br><span class="line">        self.children = []</span><br><span class="line"></span><br><span class="line"> <span class="comment"># arg: Node List</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">rebuild</span>(<span class="params">l</span>):</span></span><br><span class="line">		<span class="comment"># 节点按左值排序，即遍历顺序</span></span><br><span class="line">        l.sort(key=<span class="keyword">lambda</span> x: x.left)</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 使用列表暂存每层子树的父节点</span></span><br><span class="line">        <span class="comment"># 如 pi[0] 表示第 2 层的节点的父节点在 l 中的 index</span></span><br><span class="line">        pi = [<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i, c <span class="keyword">in</span> <span class="built_in">enumerate</span>(l):</span><br><span class="line">            <span class="keyword">if</span> c.left != <span class="number">1</span>:</span><br><span class="line">                p = l[i - <span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 使用 c 表示此节点，p 表示 c 的前一节点</span></span><br><span class="line">                <span class="comment"># 如果连续的两个节点 c 和 p 的左值增加幅度为 1，则说明其深度增加了 1</span></span><br><span class="line">                <span class="comment"># 且 p 为 c 及 c 的兄弟节点的父节点</span></span><br><span class="line">                <span class="keyword">if</span> c.left == p.left + <span class="number">1</span>:</span><br><span class="line">                    c.depth = p.depth + <span class="number">1</span></span><br><span class="line">                    <span class="keyword">if</span> c.depth - <span class="number">1</span> &gt; <span class="built_in">len</span>(pi):</span><br><span class="line">                        pi.append(i - <span class="number">1</span>)</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        pi[c.depth - <span class="number">2</span>] = i - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">                <span class="comment"># 如果 c 的左值大于 p 的父节点的右值，则说明 p 与 c 并非兄弟节点</span></span><br><span class="line">                <span class="comment"># 并可以计算出两节点的深度差为 c 的左值与 p 的右值之差减 1</span></span><br><span class="line">                <span class="keyword">elif</span> c.left &gt; l[pi[p.depth - <span class="number">2</span>]].right:</span><br><span class="line">                    c.depth = p.depth - (c.left - p.right - <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">                <span class="comment"># 不满足以上两个条件，说明 c 是 p 的兄弟节点</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    c.depth = p.depth</span><br><span class="line"></span><br><span class="line">			    <span class="comment"># 将 c 作为 pi 中记录的父节点的子节点</span></span><br><span class="line">                l[pi[c.depth - <span class="number">2</span>]].children.append(c)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> l</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h4><p>完整代码及生成 Json 和基于 D3.js[^2] 的树状图：<br><a target="_blank" rel="noopener" href="https://gist.github.com/caoyue/704e472215af29b08a27">https://gist.github.com/caoyue/704e472215af29b08a27</a></p>
+<p>[^1]: [1] <a target="_blank" rel="noopener" href="http://www.sitepoint.com/hierarchical-data-database-2">http://www.sitepoint.com/hierarchical-data-database-2</a><br>[^2]: [2] <a target="_blank" rel="noopener" href="http://d3js.org/">http://d3js.org</a></p>
+</div><div><ul class="info"><li>2015-05-11</li><li><a href="/tags/programming/">#programming</a></li></ul></div></div><div class="pager"><a class="pre" href="/page/2/">Previous</a>   <a class="next" href="/page/4/">Next</a></div></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

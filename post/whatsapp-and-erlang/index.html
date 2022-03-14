@@ -1,0 +1,57 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / WhatsApp 的一点分析</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">WhatsApp 的一点分析</div><div class="content"><p>最近的项目需要做一个跨平台的 IM 服务，想要参考下其他项目的架构。国内分享不多，微信基本没有参考价值，毕竟 QQ 的积累在那。陌陌从招聘及据网上抓包的内容看是 XMPP 协议，看起来可能是 Java 的 openfire 之类的 XMPP 路线。<br>国外的分享稍微多一些，像 WhatsApp 每年都会做一些相关的分享，看起来有些参考价值。</p>
+<h3 id="WhatsApp-目前的数据"><a href="#WhatsApp-目前的数据" class="headerlink" title="WhatsApp 目前的数据"></a>WhatsApp 目前的数据</h3><ul>
+<li>月用户约为 4.65 亿</li>
+<li>每天有 190 亿 消息进站&#x2F; 400 亿消息出站</li>
+<li>6 亿图片,2 亿音频, 1 亿视频</li>
+<li>峰值并发连接为 1.47 亿</li>
+<li>消息峰值为每秒 34.2 万进站&#x2F; 71.2 万出站</li>
+<li>节日期间流量更加惊人</li>
+</ul>
+<h3 id="支撑这些数据的硬件"><a href="#支撑这些数据的硬件" class="headerlink" title="支撑这些数据的硬件"></a>支撑这些数据的硬件</h3><ul>
+<li>约 550 台服务器</li>
+<li>约 150 台 chat server, 可以支持 1.5 亿连接</li>
+<li>约 250 台 mms 服务器</li>
+<li>数据服务器内存为 512 GB，标准节点是 64 GB</li>
+<li>除了视频，其他数据都存储在 SSD 上</li>
+<li>超过 11000 个核心</li>
+<li>Mnesia 使用了约 2TB 的内存</li>
+</ul>
+<h3 id="服务端架构"><a href="#服务端架构" class="headerlink" title="服务端架构"></a>服务端架构</h3><ul>
+<li>几乎全部使用 Erlang (经过了自己的改造)</li>
+<li>服务器使用的是 FreeBSD 9.2</li>
+<li>数据库是 Mnesia</li>
+<li>ejabberd (做了大量改造，包括使用自己的协议替代 XMPP)</li>
+<li>Yaws, lighttpd</li>
+<li>非常重视性能监控</li>
+</ul>
+<h3 id="Erlang"><a href="#Erlang" class="headerlink" title="Erlang"></a>Erlang</h3><ul>
+<li>大约 10 人的 Erlang 团队，工作包括开发和 ops</li>
+<li>服务端基本全部使用 Erlang 开发</li>
+<li>据说 Facebook Chat 开始也想要使用 Erlang ，但是由于优秀的 Erlang 工程师太难找而放弃了。不知真假，但是使用 Erlang 的好像的确不多。<br/></li>
+<li>团队对 Erlang 和 ejabberd 做了大量优化以满足越来越高的要求。但是在初期 Erlang 的表现就已经很好了</li>
+<li>选择 Erlang 的原因是：<br/><ul>
+<li>只用很少的服务器就支撑起如此庞大的活跃用户，团队认为这归功于 Erlang</li>
+<li>在 SMP 上的优秀扩展性</li>
+<li>支持热更新</li>
+</ul>
+</li>
+</ul>
+<h3 id="ejabberd"><a href="#ejabberd" class="headerlink" title="ejabberd"></a>ejabberd</h3><ul>
+<li>最初从 ejabberd 开始</li>
+<li>选择 ejabberd 是因为这是个非常优秀的开源 jabber 服务器</li>
+<li>而且 ejabberd 是用 Erlang 写的</li>
+<li>持续的对 ejabberd 进行重写和修改，包括从 XMPP 转换到内部开发协议、调整代码库以及重设计一些核心组件，并对 Erlang VM 做了大量的修改以获得高性能 Whats</li>
+</ul>
+<p>当年 WhatsApp 创始人去 Facebook 等企业求职被拒，据说原因之一是——年龄太大了。但也许只有老程序员才能坚持使用 Erlang 构建整个服务，并且用丰富的经验支撑起了整个 WhatsApp 庞大的架构——虽然主要是为了 WhatsApp 的庞大用户量而不单单是为了技术，Facebook 依然付出了 190 亿美元的代价。</p>
+</div><div><ul class="info"><li>posted on 2014-08-01<li><a href="/tags/erlang/">#erlang</a></li><li><a href="/tags/ejabberd/">#ejabberd</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/whatsapp-and-erlang/";
+    this.page.identifier = "post/whatsapp-and-erlang/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

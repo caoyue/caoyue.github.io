@@ -1,0 +1,45 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / Erlang/OTP Supervisor : one-for-one and simple-one-for-one</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">Erlang/OTP Supervisor : one-for-one and simple-one-for-one</div><div class="content"><p>Supervisor 的四个 Restart Strategy 中，关于 one for one 和 simple one for one , 虽然很多地方都说 simple one for one 是 one for one 的简化版，但两者之间还是有一些不同。</p>
+<h4 id="1-先来看一个简单的-one-for-one-和-simple-one-for-one-的例子"><a href="#1-先来看一个简单的-one-for-one-和-simple-one-for-one-的例子" class="headerlink" title="1. 先来看一个简单的 one for one 和 simple one for one 的例子"></a>1. 先来看一个简单的 one for one 和 simple one for one 的例子</h4><ul>
+<li><p>one for one</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">init</span><span class="params">(_Args)</span> -&gt;</span></span><br><span class="line">    &#123;ok, &#123;&#123;one_for_one, <span class="number">1</span>, <span class="number">60</span>&#125;,</span><br><span class="line">          [&#123;call, &#123;call, start_link, []&#125;,</span><br><span class="line">            permanent, brutal_kill, worker, [call]&#125;]&#125;&#125;.</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>simple one for one</li>
+</ul>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">init</span><span class="params">(_Args)</span> -&gt;</span></span><br><span class="line">    &#123;ok, &#123;&#123;simple_one_for_one, <span class="number">0</span>, <span class="number">1</span>&#125;,</span><br><span class="line">          [&#123;call, &#123;call, start_link, []&#125;,</span><br><span class="line">            permanent, brutal_kill, worker, [call]&#125;]&#125;&#125;.</span><br></pre></td></tr></table></figure>
+
+<p>初始化方法非常相似</p>
+</li>
+</ul>
+<h4 id="2-启动-Supervisor"><a href="#2-启动-Supervisor" class="headerlink" title="2. 启动 Supervisor"></a>2. 启动 Supervisor</h4><ul>
+<li>one for one<br>启动时，会同时启动一个子进程</li>
+<li>simple one for one<br>启动时，supervisor 并不会启动任何子进程，所有的子进程都是通过 <code>supervisor:start_child(Sup, List)</code> 来动态添加的</li>
+</ul>
+<h4 id="3-允许的-Child-Type"><a href="#3-允许的-Child-Type" class="headerlink" title="3. 允许的 Child Type"></a>3. 允许的 Child Type</h4><ul>
+<li>one for one<br>允许不同的 child type，所以每次添加子进程都需要传递完整的 child spec</li>
+<li>simple one for one<br>只能有一个 child type，不同的 child instance 可以共享同一个 child spec</li>
+</ul>
+<h4 id="4-添加子进程"><a href="#4-添加子进程" class="headerlink" title="4. 添加子进程"></a>4. 添加子进程</h4><ul>
+<li><p>one for one<br>添加子进程的时候传递的是子进程规格</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisor:start_child(Sup, ChildSpec)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>simple one for one<br>添加子进程的时候传递的是任意的值列表，它将会被添加到子进程规格中的参数列表中，即实际上是通过 <code>apply(call, start_link, [] ++ List)</code> 来启动的</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisor:start_child(Sup, List)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>相同的是，如果 supervisor 挂了，并且被 restart，之前动态添加的子进程将会全部丢失</p>
+<h4 id="5-Supervisor-停止"><a href="#5-Supervisor-停止" class="headerlink" title="5. Supervisor 停止"></a>5. Supervisor 停止</h4><ul>
+<li>one for one<br>按照启动 Spec 相反的顺序停止所有子进程，然后停止自身</li>
+<li>simple one for one<br>由于 supervisor 启动的是同一子进程的多个 instance，因此在停止的时候不存在顺序，<br>在定义 Shutdown Strategy 的时候应该注意其 terminate 表现的区别。</li>
+</ul>
+</div><div><ul class="info"><li>posted on 2015-01-20<li><a href="/tags/erlang/">#erlang</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/supervisor-simple-one-for-one/";
+    this.page.identifier = "post/supervisor-simple-one-for-one/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

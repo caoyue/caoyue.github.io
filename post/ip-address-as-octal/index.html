@@ -1,0 +1,45 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / 原来 IP 地址还可以用混合进制表示</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">原来 IP 地址还可以用混合进制表示</div><div class="content"><p>今天发现 Google 的时候发现收录了一个奇怪的地址，形如 <code>23.244.200.000000000354</code>，而且这个地址居然还是可以访问的。很显然这不是域名，尝试 ping 一下，返回地址来自于 <code>23.244.200.236</code>，可以看出 <code>000000000354</code> 是 <code>236</code> 的八进制表示形式。</p>
+<p>###混合进制<br>查了下，原来 IP 地址居然可以混合进制来显示……前导的 0 的数字会被当作八进制来处理。而且可以同时使用不同进制：包括十六进制、八进制和十进制。<br>比如 <code>http://0x17.244.0xc8.00000354</code> 这样奇葩的地址也是可以访问的……</p>
+<p>###DWORD 形式的 IP<br>还有更奇葩的，整数型的 IP —— 比如这个：<code>http://401918188</code> ，同样可以访问。<br>转换过程是将 <code>23.244.200.236</code> 转换为二进制形式，不足 8 为的数字用 0 补足： <code>00010111111101001100100011101100</code>，然后将这一串二进制数字转换为整数，即可得到整数型的 IP 地址。<br>当然，如果将这个整数换成其他进制也是可以的，比如：<br><code>http://02775144354</code> 和 <code>http://0x17f4c8ec</code></p>
+<p>###可省略的 0<br>当然，奇葩还没有结束。比如这样的 IP 地址 <code>192.168.1</code> 也是可以访问的……因为某部分为 0 则可以省略。OK，那我们怎么知道省略的是哪一部分呢？别急，「聪明」的标准的制定者们早就想到这一点了，规则如下：</p>
+<table>
+<thead>
+<tr>
+<th>abbr</th>
+<th>IP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>0.0.0.A</td>
+</tr>
+<tr>
+<td>A.B</td>
+<td>A.0.0.B</td>
+</tr>
+<tr>
+<td>A.B.C</td>
+<td>A.B.0.C</td>
+</tr>
+<tr>
+<td>A.B.C.D</td>
+<td>A.B.C.D</td>
+</tr>
+</tbody></table>
+<p>###其他<br>原 IP <code>127.0.0.1</code> 按上面的方法改变下形式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">http://0x7f.0.000000000001</span><br><span class="line"> http://2130706433</span><br><span class="line"> http://017700000001</span><br><span class="line"> http://0x7f000001</span><br><span class="line"> http://127.1</span><br><span class="line"> ……</span><br></pre></td></tr></table></figure>
+
+<p>这个特性在不同的平台上是由 socket 库实现的。在 Linux 上是 <a target="_blank" rel="noopener" href="http://linux.die.net/man/3/inet_aton">inet_aton</a> ，在 Windows 上是 <a target="_blank" rel="noopener" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms738563">inet_addr</a> 。<br>但是相关的标准文档我还没有找到。<code>rfc 2396</code> 和 <code>rfc 1738</code> 也都是语焉不详。</p>
+<p>btw，虽然主流浏览器和很多其他软件支持这种表示方法。但在某些地方可能导致问题，一般都不推荐这种做法，比如 <a target="_blank" rel="noopener" href="http://support.apple.com/kb/TA22205">Mac OS X: Do Not Use Leading Zeros in IP Address</a></p>
+</div><div><ul class="info"><li>posted on 2014-05-18<li><a href="/tags/programming/">#programming</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/ip-address-as-octal/";
+    this.page.identifier = "post/ip-address-as-octal/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>

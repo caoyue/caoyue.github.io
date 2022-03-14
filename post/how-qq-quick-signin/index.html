@@ -1,0 +1,48 @@
+<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / QQ 是怎么实现快速登录的</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">QQ 是怎么实现快速登录的</div><div class="content"><p>这个问题之前很好解决，使用浏览器 plugin 即可。<br>但是随着 Chrome 和 Firefox 都先后放弃了 NPAPI plugin，这一方法也行不通了，而且很多人是很讨厌 plugin 的。<br>但是在默认禁止了 NPAPI 的 Chrome 版本，QQ 依然可以实现快速登录（一键登录），是怎么做到的呢？</p>
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>其实不难猜。既然不存在 plugin，无法以此来实现浏览器内和本地客户端的直接通信，那么排除其他的黑科技，有一种很简单的方法可以实现这个效果。<br>那就是在客户端开一个 Server，在浏览器里面请求这个地址。<br>理论上这样是可以实现的，至于 QQ 是不是用的这种方法，稍微验证下好了。</p>
+<h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h4><ul>
+<li><p>找一个有 QQ 快速登陆的页面，比如 <code>mail.qq.com</code></p>
+</li>
+<li><p>登陆 QQ 客户端</p>
+</li>
+<li><p>打开浏览器的 Developer Tools -&gt; Network</p>
+</li>
+<li><p>刷新页面，观察所有请求的 domain</p>
+</li>
+<li><p>好明显，这就是我们要找的了</p>
+<ul>
+<li><p>完整请求 url 是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://localhost.ptlogin2.qq.com:4301/pt_get_uins?callback=ptui_getuins_CB&amp;r=0.22949112393586502&amp;pt_local_tk=-2027291081</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>看看这个请求的 Response Content</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> var_sso_uin_list = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">account</span>: <span class="string">&quot;xxxxxx&quot;</span>,</span><br><span class="line">        <span class="attr">client_type</span>: <span class="number">65793</span>,</span><br><span class="line">        <span class="attr">face_index</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">gender</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">nickname</span>: <span class="string">&quot;xxx&quot;</span>,</span><br><span class="line">        <span class="attr">uin</span>: <span class="string">&quot;xxx&quot;</span>,</span><br><span class="line">        <span class="attr">uin_flag</span>: xxxxx,</span><br><span class="line">    &#125;,</span><br><span class="line">];</span><br><span class="line">ptui_getuins_CB(var_sso_uin_list);</span><br></pre></td></tr></table></figure>
+
+<p>很明显是当前登录的用户信息</p>
+</li>
+<li><p>ping 一下这个请求的 domain<br>不出所料结果是 <code>127.0.0.1</code></p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ping</span> localhost.ptlogin2.qq.com</span><br><span class="line">:: Pinging localhost.ptlogin2.qq.com [<span class="number">127</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">1</span>] with <span class="number">32</span> bytes of data</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>现在我们验证下是否是 QQ 开了这个 Server</p>
+<ul>
+<li><p>查看哪个程序占用了 <code>4301</code> 端口</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">netstat -ano | <span class="built_in">findstr</span> &quot;<span class="number">4301</span>&quot;</span><br><span class="line">::  TCP    <span class="number">127</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">1</span>:<span class="number">4301</span>   <span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>.<span class="number">0</span>:<span class="number">0</span>   LISTENING   <span class="number">14516</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>得到 pid 我们就可以看否是 QQ 在监听这个端口了</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tasklist | <span class="built_in">findstr</span> &quot;<span class="number">14516</span>&quot;</span><br><span class="line">:: QQ.exe  <span class="number">14516</span> Console   <span class="number">2</span>     <span class="number">87</span>,<span class="number">892</span> K</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h4><p>可能有人担心会不会有安全问题，会不会其他网站访问这个 url 就拿走用户信息？其实挺容易解决，存一个 token 到服务端，获取的时候校验下就好了。<br>但是归根到底取决于腾讯对这方面安全的重视程度和意愿了，至少之前是确实存在从网页上获取当前登录的 QQ 信息的方法，虽然问题不是出在快速登录这部分。</p>
+</div><div><ul class="info"><li>posted on 2015-09-09<li><a href="/tags/programming/">#programming</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
+    this.page.url = "https://blog.caoyue.me/post/how-qq-quick-signin/";
+    this.page.identifier = "post/how-qq-quick-signin/";
+};
+
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://caoyue.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+</div></body></html>
