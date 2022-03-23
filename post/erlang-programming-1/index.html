@@ -1,147 +1,47 @@
-<html lang="zh"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/><meta name="format-detection" content="telephone=no"/><meta name="theme-color" content="#a6d6d6"/><meta name="msapplication-TileColor" content="#a6d6d6"/><meta name="msapplication-TileImage" content="/icon/favicon.ico"/><meta name="referrer" content="no-referrer"/><title>且听疯吟 / Erlang Programming 笔记 1</title><link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml"/><link rel="apple-touch-icon" sizes="192x192" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="48x48" href="/icon/favicon.ico"/><link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon.ico"/><link rel="stylesheet" href="/css/normalize.css"/><link rel="stylesheet" href="/css/style.css"/><meta name="generator" content="Hexo 6.0.0"></head><body><div class="wrap"><div class="header"><a href="/" title="this is a link">且听疯吟</a><span>如此生活三十年</span></div><div class="left"><ul class="list"><li><a href="/" title="Home">Home</a></li><li><a href="/archives" title="archive">Archive</a></li><li><a href="/tags" title="Tags">Tags</a></li></ul></div><div class="right"><div class="entry" id="content"><div class="title">Erlang Programming 笔记 1</div><div class="content"><h3 id="1-Erlang-优势"><a href="#1-Erlang-优势" class="headerlink" title="1. Erlang 优势"></a>1. Erlang 优势</h3><ol>
-<li>并发和分布式<ul>
-<li>主流语言使用共享内存模型，类似于 <code>x = x + n</code> 的代码导致了在多核环境下需要小心的处理锁的问题</li>
-<li>Erlang 使用消息模型，Process 间不共享数据，从而避免了锁的问题</li>
-<li>无锁避免了顺序瓶颈，添加节点到网络更容易</li>
-</ul>
-</li>
-<li>错误处理<ul>
-<li>多数语言默认认为程序不会出错</li>
-<li>Erlang 采用不同的设计决策——注定要出错，那就让他出错，出错后恢复就行了。即 Erlang 程序出错后，会交由更高级的 Process 来处理（重启 Child Process、系列全部终止、重启相关 Process 等等），从而实现对错误的分级和容错处理</li>
-<li>同时带来了热更新的好处，进一步保证了可用性</li>
-</ul>
-</li>
-</ol>
-<h3 id="2-入门"><a href="#2-入门" class="headerlink" title="2. 入门"></a>2. 入门</h3><ul>
-<li><p>Shell</p>
-<ul>
-<li><code>f().</code> 会释放所有绑定的变量</li>
-<li>崩溃文件分析<br><code>webtool:start().</code></li>
-</ul>
-</li>
-<li><p>原子</p>
-<ul>
-<li><p>使用单引号括起来的字符也是原子</p>
-</li>
-<li><p>这使得原子可以以大写字母开头，或者带有空格</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x27;a&#x27; = a.  <span class="comment">%a</span></span><br><span class="line">&#x27;Monday&#x27;.</span><br><span class="line">&#x27;an atom with spaces&#x27;.</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>列表</p>
-<ul>
-<li><p>可以包含不同类型</p>
-</li>
-<li><p>访问列表的头是高效的，所以通常函数处理也从列表头取起</p>
-</li>
-<li><p>插入元素到列表头部是高效的</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A = [<span class="string">&quot;a&quot;</span>,<span class="string">&quot;b&quot;</span>].</span><br><span class="line">C = [<span class="string">&quot;c&quot;</span>,<span class="string">&quot;d&quot;</span> | A ]. <span class="comment">% [&quot;c&quot;,&quot;d&quot;,&quot;a&quot;,&quot;b&quot;]</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>尽量避免使用 <code>List ++ [H]</code> 这样的操作，通常情况下添加元素到列表尾部是极为低效的（重新生成新的列表），只有在列表非常短的时候可以这样用</li>
-<li>添加在头部然后使用 <code>lists:reverse/1</code> 反转通常比添加在列表尾部效率要高</li>
-<li>尽量使用经过高度优化的 BIF ，比如反转列表 <code>lists:reverse/1</code>，可以从源码中找到它的定义，但是这个定义通常是作为简单的声明，实际上编译器会使用这个函数在系统内部更为高效的版本</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>字符串</p>
-<ul>
-<li><p>严格说来 Erlang 中并没有字符串</p>
-</li>
-<li><p>字符串实际上是整数列表的一种「速记&#x2F;代表」形式</p>
-</li>
-<li><p>可用 <code>$</code> 来表示字符串的整数值</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A = $a.  <span class="comment">% 97</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h3 id="3-顺序型编程"><a href="#3-顺序型编程" class="headerlink" title="3. 顺序型编程"></a>3. 顺序型编程</h3><ul>
-<li><p>beam<br>beam 是 Bogdan’s Erlang Abstract Machine 的缩写</p>
-</li>
-<li><p>匿名函数 fun</p>
-<ul>
-<li><p>fun 也可以拥有多个子句</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TempFun = <span class="keyword">fun</span> (&#123;square, X&#125;) -&gt; X*X;</span><br><span class="line">	          (&#123;double,X&#125;) -&gt; X+X</span><br><span class="line">  	  <span class="keyword">end</span>.</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>列表解析</p>
-<ul>
-<li><p>列表解析实现最简单的 Map</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">map</span><span class="params">(F, L)</span> = [F<span class="params">(X)</span> || X &lt;- L].</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>列表解析中的生成器实际上也可以起到过滤的作用</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ X || &#123;X, _&#125; &lt;- [ a,&#123;c, d&#125;, <span class="string">&quot;aa&quot;</span>, &#123;<span class="string">&quot;c&quot;</span>, e&#125;]].</span><br><span class="line"><span class="comment">% [ c, &quot;c&quot;]</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>快排算法</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">qsort</span><span class="params">([])</span> -&gt;</span></span><br><span class="line">    [];</span><br><span class="line"><span class="function"><span class="title">qsort</span><span class="params">([Pivot | T])</span> -&gt;</span></span><br><span class="line">			qsort([X || X &lt;- T, X &lt; Pivot])</span><br><span class="line">			++ [H] ++</span><br><span class="line">			qsort([X || X &lt;- T, X &gt;= Pivot]).</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>毕达哥拉斯三元组</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">pythag</span><span class="params">(N)</span> -&gt;</span></span><br><span class="line">	[&#123;A, B, C&#125; || A &lt;- lists:seq(<span class="number">1</span>, N),</span><br><span class="line">			  B &lt;- lists:seq(<span class="number">1</span>, N),</span><br><span class="line">			  C &lt;- lists:seq(<span class="number">1</span>, N),</span><br><span class="line">			  A + B + C =&lt; N,</span><br><span class="line">			  A*A + B*B =:= C*C</span><br><span class="line">	].</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>全排列</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">perms</span><span class="params">([])</span> -&gt;</span></span><br><span class="line">	[[]];</span><br><span class="line"><span class="function"><span class="title">perms</span><span class="params">(List)</span> -&gt;</span></span><br><span class="line">	[ [H | T] || H &lt;- L, T &lt;- perms(L -- [H]) ].</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>断言</p>
-<ul>
-<li><p>以 when 开头</p>
-</li>
-<li><p>用 <code>;</code> 隔开的断言，只要有一个为 <code>true</code> 则断言序列成立</p>
-</li>
-<li><p>用 <code>,</code> 隔开的断言，只有全部为 <code>true</code> 断言才会成立</p>
-</li>
-<li><p>合法的断言必须保证没有副作用，可以包含一些无副作用的 BIF ，但无法使用用户自定义的布尔表达式函数</p>
-</li>
-<li><p><code>and, or</code> 和 <code>andalso, orelse</code><br><a href="http://blog.caoyue.me/post/erlang-guard-and-andalso-or-orelse">Erlang Guard: and&#x2F;andalso, or&#x2F;orelse </a></p>
-</li>
-<li><p><code>==</code> 和 <code>=:=</code>，<code>/=</code> 和 <code>=/=</code></p>
-<ul>
-<li><p><code>=:=</code> 代表精确等于，在比较的时候不会对数据类型进行转换</p>
-</li>
-<li><p><code>=/=</code> 代表精确不等于</p>
-</li>
-<li><p>99% 的情况下应使用 <code>=:=</code> 或 <code>=/=</code></p>
-</li>
-<li><p>模式匹配中实际上是 <code>=:=</code>，即 <code>f(12)</code> 不会匹配到 <code>f(12.0)</code></p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> == <span class="number">1.0</span>. <span class="comment">% true</span></span><br><span class="line"><span class="number">1</span> =:= <span class="number">1.0</span>。 <span class="comment">%false</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>比较运算符的优先级</p>
-<ul>
-<li><p>不同数据类型也可以比较大小，其优先级是：</p>
-<p><code>number &lt; atom &lt; reference &lt; fun &lt; port &lt; pid &lt; tuple &lt; list &lt; binary</code></p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;&lt;<span class="string">&quot;1&quot;</span>&gt;&gt; &gt; [<span class="string">&quot;2&quot;</span>].   <span class="comment">% true</span></span><br><span class="line">[<span class="string">&quot;2&quot;</span>] &gt; &#123;<span class="string">&quot;3&quot;</span>&#125;. <span class="comment">% true</span></span><br><span class="line">&#123;<span class="string">&quot;3&quot;</span>&#125; &gt; &#x27;atom&#x27;. <span class="comment">% true</span></span><br><span class="line">atom &gt; <span class="number">1</span>. <span class="comment">% true</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>record</p>
-<ul>
-<li>Record 实际上只是 tuple 的「伪装」，其本质上是一个 tuple</li>
-</ul>
-</li>
-<li><p>case&#x2F;if</p>
-<ul>
-<li>Erlang 中不存在多个 case 匹配一个执行块的语法</li>
-<li>Erlang 中任何表达式都是有值的，包括 case，因此可以有 <code>X = case ... end</code></li>
-<li>Case 最后使用 <code>_</code> , if 最后使用 <code>true</code> 是保证所有分支得到匹配的方法</li>
-</ul>
-</li>
-<li><p>累加器</p>
-<ul>
-<li>存储迭代过程中的临时容器</li>
-</ul>
-</li>
-</ul>
-</div><div><ul class="info"><li>posted on 2015-04-21<li><a href="/tags/erlang/">#erlang</a></li></li></ul></div></div><div id="disqus_thread"></div><script>var disqus_config = function () {
-    this.page.url = "https://blog.caoyue.me/post/erlang-programming-1/";
-    this.page.identifier = "post/erlang-programming-1/";
-};
-
-(function() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://caoyue.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-})();</script></div><div class="footer"><div></div>©2021<a href="https://blog.caoyue.me"> 且听疯吟</a>. designed by<a href="https://caoyue.me" target="_blank"> caoyue</a>. powered by<a href="https://hexo.io/" target="_blank"> hexo</a></div><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
-</div></body></html>
+<!doctype html><html lang=zh-hans><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="default"><meta name=format-detection content="telephone=no"><meta name=theme-color content="#a6d6d6"><meta name=referrer content="no-referrer"><meta name=description content="1. Erlang 优势  并发和分布式  主流语言使用共享内存模型，类似于 x = x + n 的代码导致了在多核环境下需要小心的处理锁的问题 Erlang 使用消息模型，Process 间不共享数据，从而避免了锁的问题 无锁避免了顺序瓶颈，添加节点到网络更容易   错误处理  多数语言默认认为程序不会出错 Erlang 采用不同的设计决策——注定要出错，那就让他出错，出错后恢复就行了。即 Erlang 程序出错后，会交由更高级的 Process 来处理（重启 Child Process、系列全部终止、重启相关 Process 等等），从而实现对错误的分级和容错处理 同时带来了热更新的好处，进一步保证了可用性    2. 入门   Shell
+ f(). 会释放所有绑定的变量 崩溃文件分析
+webtool:start().    原子
+  使用单引号括起来的字符也是原子
+  这使得原子可以以大写字母开头，或者带有空格
+'a' = a. %a 'Monday'. 'an atom with spaces'.     列表"><meta name=author content="caoyue"><title>且听疯吟 / Erlang Programming 笔记 1</title><link rel=alternate type=application/rss+xml href=/index.xml title=且听疯吟><link rel=apple-touch-icon sizes=192x192 href=https://blog.caoyue.me/favicon.png><link rel=icon type=image/png sizes=48x48 href=https://blog.caoyue.me/favicon.png><link rel=icon type=image/png sizes=192x192 href=https://blog.caoyue.me/favicon.png><link rel=stylesheet type=text/css href=https://blog.caoyue.me/normalize.css><link rel=stylesheet type=text/css href=https://blog.caoyue.me/scss/style.css><link rel=stylesheet type=text/css href=https://blog.caoyue.me/syntax/monokailight.css id=syntax-theme><script type=text/javascript>function syntaxHighlight(){var e=document.querySelector("#syntax-theme");let t="https://blog.caoyue.me/syntax/monokailight.css",n="https://blog.caoyue.me/syntax/dracula.css",s=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?n:t;e.href=s}syntaxHighlight(),window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{syntaxHighlight()})</script><script src=https://kit.fontawesome.com/061cfdc036.js crossorigin=anonymous></script></head><body><div class=wrap><header class=header><a href=/ title=且听疯吟>且听疯吟</a>
+<span>如此生活三十年</span></header><div class=left><ul class=list><li><a href=/ title=Home>Home</a></li><li><a href=/tweets title=碎碎念>Tweets</a></li><li><a href=/archives title=Archives>Archives</a></li><li><a href=/tags title=Tags>Tags</a></li></ul></div><div class=right><div class=entry id=cotent><div class=title>Erlang Programming 笔记 1</div><div class=content><h3 id=1-erlang-优势>1. Erlang 优势</h3><ol><li>并发和分布式<ul><li>主流语言使用共享内存模型，类似于 <code>x = x + n</code> 的代码导致了在多核环境下需要小心的处理锁的问题</li><li>Erlang 使用消息模型，Process 间不共享数据，从而避免了锁的问题</li><li>无锁避免了顺序瓶颈，添加节点到网络更容易</li></ul></li><li>错误处理<ul><li>多数语言默认认为程序不会出错</li><li>Erlang 采用不同的设计决策——注定要出错，那就让他出错，出错后恢复就行了。即 Erlang 程序出错后，会交由更高级的 Process 来处理（重启 Child Process、系列全部终止、重启相关 Process 等等），从而实现对错误的分级和容错处理</li><li>同时带来了热更新的好处，进一步保证了可用性</li></ul></li></ol><h3 id=2-入门>2. 入门</h3><ul><li><p>Shell</p><ul><li><code>f().</code> 会释放所有绑定的变量</li><li>崩溃文件分析<br><code>webtool:start().</code></li></ul></li><li><p>原子</p><ul><li><p>使用单引号括起来的字符也是原子</p></li><li><p>这使得原子可以以大写字母开头，或者带有空格</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=n>&#39;a&#39;</span> <span class=o>=</span> <span class=n>a</span><span class=p>.</span>  <span class=c>%a
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=n>&#39;Monday&#39;</span><span class=p>.</span>
+</span></span><span class=line><span class=cl><span class=n>&#39;an atom with spaces&#39;</span><span class=p>.</span>
+</span></span></code></pre></div></li></ul></li><li><p>列表</p><ul><li><p>可以包含不同类型</p></li><li><p>访问列表的头是高效的，所以通常函数处理也从列表头取起</p></li><li><p>插入元素到列表头部是高效的</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nv>A</span> <span class=o>=</span> <span class=p>[</span><span class=s>&#34;a&#34;</span><span class=p>,</span><span class=s>&#34;b&#34;</span><span class=p>].</span>
+</span></span><span class=line><span class=cl><span class=nv>C</span> <span class=o>=</span> <span class=p>[</span><span class=s>&#34;c&#34;</span><span class=p>,</span><span class=s>&#34;d&#34;</span> <span class=p>|</span> <span class=nv>A</span> <span class=p>].</span> <span class=c>% [&#34;c&#34;,&#34;d&#34;,&#34;a&#34;,&#34;b&#34;]
+</span></span></span></code></pre></div><ul><li>尽量避免使用 <code>List ++ [H]</code> 这样的操作，通常情况下添加元素到列表尾部是极为低效的（重新生成新的列表），只有在列表非常短的时候可以这样用</li><li>添加在头部然后使用 <code>lists:reverse/1</code> 反转通常比添加在列表尾部效率要高</li><li>尽量使用经过高度优化的 BIF ，比如反转列表 <code>lists:reverse/1</code>，可以从源码中找到它的定义，但是这个定义通常是作为简单的声明，实际上编译器会使用这个函数在系统内部更为高效的版本</li></ul></li></ul></li><li><p>字符串</p><ul><li><p>严格说来 Erlang 中并没有字符串</p></li><li><p>字符串实际上是整数列表的一种「速记/代表」形式</p></li><li><p>可用 <code>$</code> 来表示字符串的整数值</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nv>A</span> <span class=o>=</span> <span class=sc>$a</span><span class=p>.</span>  <span class=c>% 97
+</span></span></span></code></pre></div></li></ul></li></ul><h3 id=3-顺序型编程>3. 顺序型编程</h3><ul><li><p>beam<br>beam 是 Bogdan&rsquo;s Erlang Abstract Machine 的缩写</p></li><li><p>匿名函数 fun</p><ul><li><p>fun 也可以拥有多个子句</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nv>TempFun</span> <span class=o>=</span> <span class=k>fun</span> <span class=p>({</span><span class=n>square</span><span class=p>,</span> <span class=nv>X</span><span class=p>})</span> <span class=o>-&gt;</span> <span class=nv>X</span><span class=o>*</span><span class=nv>X</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>	          <span class=p>({</span><span class=n>double</span><span class=p>,</span><span class=nv>X</span><span class=p>})</span> <span class=o>-&gt;</span> <span class=nv>X</span><span class=o>+</span><span class=nv>X</span>
+</span></span><span class=line><span class=cl>  	  <span class=k>end</span><span class=p>.</span>
+</span></span></code></pre></div></li></ul></li><li><p>列表解析</p><ul><li><p>列表解析实现最简单的 Map</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nf>map</span><span class=p>(</span><span class=nv>F</span><span class=p>,</span> <span class=nv>L</span><span class=p>)</span> <span class=o>=</span> <span class=p>[</span><span class=nv>F</span><span class=p>(</span><span class=nv>X</span><span class=p>)</span> <span class=p>||</span> <span class=nv>X</span> <span class=o>&lt;-</span> <span class=nv>L</span><span class=p>].</span>
+</span></span></code></pre></div></li><li><p>列表解析中的生成器实际上也可以起到过滤的作用</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=p>[</span> <span class=nv>X</span> <span class=p>||</span> <span class=p>{</span><span class=nv>X</span><span class=p>,</span> <span class=p>_}</span> <span class=o>&lt;-</span> <span class=p>[</span> <span class=n>a</span><span class=p>,{</span><span class=n>c</span><span class=p>,</span> <span class=n>d</span><span class=p>},</span> <span class=s>&#34;aa&#34;</span><span class=p>,</span> <span class=p>{</span><span class=s>&#34;c&#34;</span><span class=p>,</span> <span class=n>e</span><span class=p>}]].</span>
+</span></span><span class=line><span class=cl><span class=c>% [ c, &#34;c&#34;]
+</span></span></span></code></pre></div></li><li><p>快排算法</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nf>qsort</span><span class=p>([])</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=nf>qsort</span><span class=p>([</span><span class=nv>Pivot</span> <span class=p>|</span> <span class=nv>T</span><span class=p>])</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>			<span class=n>qsort</span><span class=p>([</span><span class=nv>X</span> <span class=p>||</span> <span class=nv>X</span> <span class=o>&lt;-</span> <span class=nv>T</span><span class=p>,</span> <span class=nv>X</span> <span class=o>&lt;</span> <span class=nv>Pivot</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>			<span class=o>++</span> <span class=p>[</span><span class=nv>H</span><span class=p>]</span> <span class=o>++</span>
+</span></span><span class=line><span class=cl>			<span class=n>qsort</span><span class=p>([</span><span class=nv>X</span> <span class=p>||</span> <span class=nv>X</span> <span class=o>&lt;-</span> <span class=nv>T</span><span class=p>,</span> <span class=nv>X</span> <span class=o>&gt;=</span> <span class=nv>Pivot</span><span class=p>]).</span>
+</span></span></code></pre></div></li><li><p>毕达哥拉斯三元组</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nf>pythag</span><span class=p>(</span><span class=nv>N</span><span class=p>)</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=p>[{</span><span class=nv>A</span><span class=p>,</span> <span class=nv>B</span><span class=p>,</span> <span class=nv>C</span><span class=p>}</span> <span class=p>||</span> <span class=nv>A</span> <span class=o>&lt;-</span> <span class=nn>lists</span><span class=p>:</span><span class=nf>seq</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=nv>N</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>			  <span class=nv>B</span> <span class=o>&lt;-</span> <span class=nn>lists</span><span class=p>:</span><span class=nf>seq</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=nv>N</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>			  <span class=nv>C</span> <span class=o>&lt;-</span> <span class=nn>lists</span><span class=p>:</span><span class=nf>seq</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=nv>N</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>			  <span class=nv>A</span> <span class=o>+</span> <span class=nv>B</span> <span class=o>+</span> <span class=nv>C</span> <span class=o>=&lt;</span> <span class=nv>N</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>			  <span class=nv>A</span><span class=o>*</span><span class=nv>A</span> <span class=o>+</span> <span class=nv>B</span><span class=o>*</span><span class=nv>B</span> <span class=o>=:=</span> <span class=nv>C</span><span class=o>*</span><span class=nv>C</span>
+</span></span><span class=line><span class=cl>	<span class=p>].</span>
+</span></span></code></pre></div></li><li><p>全排列</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=nf>perms</span><span class=p>([])</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=p>[[]];</span>
+</span></span><span class=line><span class=cl><span class=nf>perms</span><span class=p>(</span><span class=nv>List</span><span class=p>)</span> <span class=o>-&gt;</span>
+</span></span><span class=line><span class=cl>	<span class=p>[</span> <span class=p>[</span><span class=nv>H</span> <span class=p>|</span> <span class=nv>T</span><span class=p>]</span> <span class=p>||</span> <span class=nv>H</span> <span class=o>&lt;-</span> <span class=nv>L</span><span class=p>,</span> <span class=nv>T</span> <span class=o>&lt;-</span> <span class=n>perms</span><span class=p>(</span><span class=nv>L</span> <span class=o>--</span> <span class=p>[</span><span class=nv>H</span><span class=p>])</span> <span class=p>].</span>
+</span></span></code></pre></div></li></ul></li><li><p>断言</p><ul><li><p>以 when 开头</p></li><li><p>用 <code>;</code> 隔开的断言，只要有一个为 <code>true</code> 则断言序列成立</p></li><li><p>用 <code>,</code> 隔开的断言，只有全部为 <code>true</code> 断言才会成立</p></li><li><p>合法的断言必须保证没有副作用，可以包含一些无副作用的 BIF ，但无法使用用户自定义的布尔表达式函数</p></li><li><p><code>and, or</code> 和 <code>andalso, orelse</code><br><a href=http://blog.caoyue.me/post/erlang-guard-and-andalso-or-orelse>Erlang Guard: and/andalso, or/orelse</a></p></li><li><p><code>==</code> 和 <code>=:=</code>，<code>/=</code> 和 <code>=/=</code></p><ul><li><p><code>=:=</code> 代表精确等于，在比较的时候不会对数据类型进行转换</p></li><li><p><code>=/=</code> 代表精确不等于</p></li><li><p>99% 的情况下应使用 <code>=:=</code> 或 <code>=/=</code></p></li><li><p>模式匹配中实际上是 <code>=:=</code>，即 <code>f(12)</code> 不会匹配到 <code>f(12.0)</code></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=mi>1</span> <span class=o>==</span> <span class=mi>1</span><span class=p>.</span><span class=mi>0</span><span class=p>.</span> <span class=c>% true
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=mi>1</span> <span class=o>=:=</span> <span class=mi>1</span><span class=p>.</span><span class=mi>0</span><span class=err>。</span> <span class=c>%false
+</span></span></span></code></pre></div></li></ul></li><li><p>比较运算符的优先级</p><ul><li><p>不同数据类型也可以比较大小，其优先级是：</p><p><code>number &lt; atom &lt; reference &lt; fun &lt; port &lt; pid &lt; tuple &lt; list &lt; binary</code></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-erlang data-lang=erlang><span class=line><span class=cl><span class=o>&lt;&lt;</span><span class=s>&#34;1&#34;</span><span class=o>&gt;&gt;</span> <span class=o>&gt;</span> <span class=p>[</span><span class=s>&#34;2&#34;</span><span class=p>].</span>   <span class=c>% true
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=p>[</span><span class=s>&#34;2&#34;</span><span class=p>]</span> <span class=o>&gt;</span> <span class=p>{</span><span class=s>&#34;3&#34;</span><span class=p>}.</span> <span class=c>% true
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=p>{</span><span class=s>&#34;3&#34;</span><span class=p>}</span> <span class=o>&gt;</span> <span class=n>&#39;atom&#39;</span><span class=p>.</span> <span class=c>% true
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=n>atom</span> <span class=o>&gt;</span> <span class=mi>1</span><span class=p>.</span> <span class=c>% true
+</span></span></span></code></pre></div></li></ul></li></ul></li><li><p>record</p><ul><li>Record 实际上只是 tuple 的「伪装」，其本质上是一个 tuple</li></ul></li><li><p>case/if</p><ul><li>Erlang 中不存在多个 case 匹配一个执行块的语法</li><li>Erlang 中任何表达式都是有值的，包括 case，因此可以有 <code>X = case ... end</code></li><li>Case 最后使用 <code>_</code> , if 最后使用 <code>true</code> 是保证所有分支得到匹配的方法</li></ul></li><li><p>累加器</p><ul><li>存储迭代过程中的临时容器</li></ul></li></ul></div><div class=tags><ul class=info><li>2015-04-21</li><li><a href=https://blog.caoyue.me/tags/erlang>#erlang</a></li><li class=button title="show comments" id=toggle-comments><i class="fa-solid fa-message"></i></li></ul></div></div><div class=comments id=comments><section class="article discussion" style=display:none><script>function loadComment(){let t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"photon-dark":"github-light",e=document.createElement("script");e.src="https://utteranc.es/client.js",e.setAttribute("repo","caoyue/caoyue.github.io"),e.setAttribute("issue-term","pathname"),e.setAttribute("theme",t),e.setAttribute("label","Comment"),e.setAttribute("crossorigin","anonymous"),e.setAttribute("async",''),document.querySelector("section.article.discussion").innerHTML='',document.querySelector("section.article.discussion").appendChild(e)}loadComment(),window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{loadComment()});function toggleComment(){let e=document.querySelector("section.article.discussion");e.style.display=="none"?e.style.display="block":e.style.display="none"}document.querySelector("#toggle-comments").addEventListener("click",toggleComment)</script></section></div></div><footer class=footer><div>©2022 <a href=/>且听疯吟</a>. designed
+by <a href=https://caoyue.me target=_blank>caoyue</a>.
+powered by <a href=https://gohugo.io/ target=_blank>hugo</a>.
+<script defer src=https://static.cloudflareinsights.com/beacon.min.js data-cf-beacon='{"token": "1a24e73fd4284bfa8b43ecf5a5c2c100"}'></script>
+<script defer src=https://use.typekit.net/jdb5cpn.js></script>
+<script type=text/javascript>try{Typekit.load({async:!0})}catch(e){}</script></div></footer></div></body></html>

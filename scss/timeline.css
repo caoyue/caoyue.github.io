@@ -1,0 +1,89 @@
+.timeline-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; }
+
+.timeline-container {
+  margin: 50px auto; }
+
+.timeline {
+  position: relative;
+  padding-left: 4rem;
+  margin: 0 0 0 30px;
+  color: white;
+  max-width: 90%; }
+  .timeline p {
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1.5;
+    opacity: 0.9; }
+  .timeline:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -10px;
+    width: 4px;
+    height: 100%;
+    background: #a1d3d6; }
+  .timeline .timeline-container {
+    position: relative;
+    margin-bottom: 2.5rem; }
+    .timeline .timeline-container .timeline-icon {
+      color: rgba(161, 211, 214, 0.9);
+      position: absolute;
+      left: -88px;
+      top: 4px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 2rem;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+    .timeline .timeline-container .timeline-body {
+      background: #a1d3d6;
+      border-radius: 3px;
+      padding: 20px 20px 15px;
+      box-shadow: 1px 3px 9px rgba(0, 0, 0, 0.1); }
+      .timeline .timeline-container .timeline-body:before {
+        content: "";
+        background: inherit;
+        width: 20px;
+        height: 20px;
+        display: block;
+        position: absolute;
+        left: -10px;
+        transform: rotate(45deg);
+        border-radius: 0 0 0 2px; }
+      .timeline .timeline-container .timeline-body .timeline-title {
+        border: none;
+        margin-bottom: 1.4rem; }
+        .timeline .timeline-container .timeline-body .timeline-title .badge {
+          background: white;
+          padding: 4px 8px;
+          border-radius: 3px;
+          font-size: 12px;
+          font-weight: bold; }
+      .timeline .timeline-container .timeline-body .timeline-subtitle {
+        font-weight: 300;
+        font-style: italic;
+        opacity: 0.9;
+        margin-top: 16px;
+        font-size: 16px;
+        color: inherit; }
+      .timeline .timeline-container .timeline-body .toggle-comments {
+        margin-left: 15px; }
+
+@media (prefers-color-scheme: dark) {
+  .timeline {
+    color: rgba(232, 230, 227, 0.8); }
+    .timeline .timeline-container .timeline-body {
+      background-color: #0c3e41; }
+      .timeline .timeline-container .timeline-body:before {
+        background-color: #0c3e41; }
+    .timeline .timeline-container .timeline-icon {
+      background-color: #202324; }
+    .timeline:before {
+      background-color: rgba(12, 62, 65, 0.9); } }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>react on 且听疯吟</title><link>https://blog.caoyue.me/tags/react/</link><description>Recent content in react on 且听疯吟</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><managingEditor>i@caoyue.me (caoyue)</managingEditor><webMaster>i@caoyue.me (caoyue)</webMaster><lastBuildDate>Wed, 09 Mar 2016 15:21:00 +0000</lastBuildDate><atom:link href="https://blog.caoyue.me/tags/react/index.xml" rel="self" type="application/rss+xml"/><item><title>使用 Travis CI 自动部署 React Native 项目 （iOS 篇）</title><link>https://blog.caoyue.me/post/react-native-travis-ci-ios/</link><pubDate>Wed, 09 Mar 2016 15:21:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/react-native-travis-ci-ios/</guid><description>编译、测试、打包、部署这一系列的操作实在是太麻烦而且容易出错漏，能自动化的东西我们就没必要手动去点。端着咖啡悠哉地等着叮的一声，安装包出现在面前，这才是我们想要的
+花了点时间，把正在进行的 React Native 项目的自动部署完善了一下，实现了通过 Travis CI 自动编译测试，并打包成 ipa 发布到 FTP 的整个流程
+现在只要 Push 到 Github 上，等到 Travis CI 运行完成，就直接可以拿到 ipa 包安装测试了
+准备工作：
+首先你需要一个 Github 账户
+Travis CI 连接 Gtihub 后，会自动检查根目录下带有 .travis.yml 的项目
+关于 Travis CI 的功能和文档，请参考 https://docs.travis-ci.com/
+这里给出一个 React Native 项目的 yml 文件示例：
+language:objective-cosx_image:xcode7.1xcode_project:ios/MyApp.xcodeprojxcode_scheme:MyAppenv:matrix:- SPEC=spec1before_install:- ./scripts/decrypt_key.sh- ./scripts/add_key.sh- brew updateinstall:- brew reinstall node flow watchman xctool- npm install -g react-native-clibranches:only:- masterscript:- ./scripts/release.sh首先设置项目编译环境： 包括 language 和 要使用的编译镜像 osx_image，并指定项目文件和编译的 scheme
+证书加密： 由于 iOS 打包过程需要一些证书密钥，这些是无法公开 Push 到 Github 的</description></item><item><title>react and react native</title><link>https://blog.caoyue.me/post/react-and-react-native/</link><pubDate>Tue, 27 Oct 2015 20:20:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/react-and-react-native/</guid><description>最近了解了下 react 和 react native，感觉看到了一条成为「Full-stack Developer」的捷径啊（雾
+React 消息同步
+不管是 Web 还是 Native 应用，一个很麻烦的问题就是保持某个 Message 在不同 View 之间的状态同步。
+比如，收到一条消息，需要在未读标签显示状态和数字，然后未读列表中插入一条消息记录。
+阅读消息后，需要从未读中去掉这条记录，同时在已读中新增一条记录，还不能忘了将未读数字减去。
+我们是怎么处理这种情况？
+要在接收消息的 handler 中判断各个 View 当前的状态，然后根据对应的状态写不同的处理代码，阅读消息同理。当然高端点的可能自己搞个 Manager 之类的东西去对这些逻辑进行管理。
+但是，并没有什么用。一旦业务复杂，处理和 Debug 起来就很麻烦了。看上去未读是 1，点进去发现是空，这种场景想必见得也不少了。
+还记得很久之前我们怎么写页面的吗？（多久？大概到 ASP 吧=-= 那时候我们没有这么多烦恼。因为我们是这么干的。不管什么操作，ok，刷新页面，可以保证所有状态都是正确的，so easy!
+React + Flux 所做的正和我们很久之前的做法有点像。数据更新了？重新渲染一遍 View 不就好了。
+但是将整个 DOM 重新渲染一遍是开销很大的，当然不可能真的这么做。
+所以就有了 Virtual DOM。
+其实我们对 View 所做的操作大部分都是修改内容，比如修改某个块里面的文字啦，对某个 list 增删改啦。这些都不需要完全重绘。
+React 做到了「智能」去更新 DOM，只改变需要改变的地方。（嗯，就是不相信你能写出高效正确的操作 DOM 的代码，所以我们都帮你写好啦~（雾
+组件化
+通常我们的页面上的控件都是带有不同的状态的，比如选框是否选中等等。而不同情况下状态可能会根据一些参数去变化，这让一般情况下的组件复用变得很麻烦。
+而 React 可以做到类似于函数的给定输入参数，输出固定的状态，可以很方便的实现 Web Components，也不会出现组件状态上的冲突。</description></item></channel></rss>

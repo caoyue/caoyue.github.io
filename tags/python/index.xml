@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>python on 且听疯吟</title><link>https://blog.caoyue.me/tags/python/</link><description>Recent content in python on 且听疯吟</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><managingEditor>i@caoyue.me (caoyue)</managingEditor><webMaster>i@caoyue.me (caoyue)</webMaster><lastBuildDate>Mon, 05 Aug 2013 14:58:53 +0000</lastBuildDate><atom:link href="https://blog.caoyue.me/tags/python/index.xml" rel="self" type="application/rss+xml"/><item><title>Whoosh 全文搜索</title><link>https://blog.caoyue.me/post/whoosh-search/</link><pubDate>Mon, 05 Aug 2013 14:58:53 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/whoosh-search/</guid><description>Whoosh 是一个纯 Python 实现的全文搜索组件。基础架构和 Lucene 比较像。使用试了试，记录一些东西。
+中文分词
+Whoosh 本身只有英文分词，因此需要添加中文分词组件。
+最后选择了 Jieba 这个 Python 中文分词组件，初步测试分词效果还不错。有时间会把几个中文分词组件对比一下看看。
+Jieba 已经封装好了 ChineseAnalyzer for Whoosh，只需要引用 from jieba.analyse import ChineseAnalyzer 来替换 Whoosh 的 Analyzer 即可。
+HTML 抽取
+对于纯文本直接分析建立索引即可。
+而对于 HTML 文本，我们需要先将其中的文本抽取出来再进行运行分析程序。否则其中的 HTML 标签将会被当作文本来分析，比如搜索 &amp;ldquo;span&amp;rdquo; 将会得到所有包含 &amp;lt;span&amp;gt;&amp;lt;/span&amp;gt; 的内容。举个例子，用 HTMLParser 来提取文本，其他类似功能的模块也有不少。
+def html_strip(html): from HTMLParser import HTMLParser html = html.strip() html = html.strip(&amp;#34;\n&amp;#34;) result = [] parse = HTMLParser() parse.handle_data = result.append parse.feed(html) parse.close() return &amp;#34;&amp;#34;.join(result) 关键词 Highlight
+默认的高亮结果只会包含结果命中的部分碎片，需要不同展示可以使用不同的 Fragmenters 。比如展示全文需要 whoosh.</description></item><item><title>Project Timeline</title><link>https://blog.caoyue.me/post/project-timeline/</link><pubDate>Tue, 30 Jul 2013 16:49:59 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/project-timeline/</guid><description>做了一个同步微博、Twitter 和 Rss Feed 到本地的工具，方便保存和查看自己的数据，以及用自己的数据做一些好玩的事。
+MyTimeline
+聚合分散在各个网站上的 Timeline
+Support:
+Rss Feed Twitter Oauth Weibo Oauth 同步发送消息到第三方
+/update
+Support:
+Twitter Weibo 按日期查看过往记录
+/past
+对所有记录的统计图表
+/statistic
+Support：
+按时段统计 按月份统计 按分类统计 TODO
+其他第三方支持 搜索 Other&amp;hellip; Tools
+Linux Python Web.py Nginx/Gunicorn MySql Google Chart Demo
+Demo License
+MIT Feel free to give me some feedback:)</description></item></channel></rss>

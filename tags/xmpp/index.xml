@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>xmpp on 且听疯吟</title><link>https://blog.caoyue.me/tags/xmpp/</link><description>Recent content in xmpp on 且听疯吟</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><managingEditor>i@caoyue.me (caoyue)</managingEditor><webMaster>i@caoyue.me (caoyue)</webMaster><lastBuildDate>Tue, 07 Jul 2015 18:01:00 +0000</lastBuildDate><atom:link href="https://blog.caoyue.me/tags/xmpp/index.xml" rel="self" type="application/rss+xml"/><item><title>XMPP 安全相关</title><link>https://blog.caoyue.me/post/xmpp-security/</link><pubDate>Tue, 07 Jul 2015 18:01:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/xmpp-security/</guid><description>最近又从头看 XMPP 的 RFC1，有时候也考虑如果是自己来设计，会如何做。
+之前的印象是 XMPP 的繁琐和低效，现在看来，作为通用的协议，XMPP 确实有做得不错的地方，从头看下来还是有不少收获的。
+现在项目告一段落，回头整理下 XMPP 服务端安全方面的一些简单想法，大概想到哪写到哪吧，安全方面懂得不多，欢迎指正。
+考虑到安全，我们的初始目标大概包括这些：
+与服务端通信安全（不被窃听/篡改） 鉴别用户身份 保护用户数据 TLS TLS2 用于在两个通信应用程序之间提供保密性和数据完整性，是必须开启的。
+SASL SASL3 是一种验证用户身份的框架。XMPP 本身没有办法分辨用户身份，必须借助于 SASL 协议。
+SASL 协议确定了客户端和服务端沟通的应答机制及传输的编码方法，剩下的就需要自己实现了。
+要识别用户身份，你需要在 SASL 的框架下定义和服务端交换的具体身份信息（比如用户名、密码），以及实现身份信息的存储和验证方式，而不需要考虑其他细节。
+具体到 XMPP 下 SASL 的验证流程（如果建立了 TLS 连接，此时是在 TLS 连接上的）：
+一般不必支持所有的 SASL mechanisms ，选择安全性更可靠的，比如 SCRAM-SHA-1 (尽量不要使用 plain)：
+详细登录流程可以参考 ejabberd: Login
+SCRAM-SHA-1 SCRAM4（Salted Challenge Response Authentication Mechanism） 是近年才开始使用的更安全的一种加密验证机制，可以很好的在 Server 和 Client 之间做双向的验证，已经有很多的服务开始使用这种方式验证了，比如 MongoDB。XMPP 也在协议中提供了这种方式的说明。
+不讨论详细的加密算法细节，客户端验证登录时，大概流程如下：
+client 发送想要登录的 username 到 server (即 auth) server 为该 username 生成/查找出 salt（s)，和 iteration count（i）、server nonce (r) 一并发回给 client （challenge，base64 编码） client 使用给定的 salt 和 iteration count 加密持有的 password，发回给 server （如果服务端对该 client 使用的 salt 和 iteration count 是固定的话，可以存储下生成的 client key，从而避免在 client 明文存储密码，会更安全） server 验证结果，如果成功则返回 success，并附上计算值 client 校验 success 中返回的值，通过则证明 server 拥有 client 的验证 end_to_end 如果有非常严格的安全需求，可以考虑 OpenPGP ，XMPP 协议也提供了有限的支持</description></item></channel></rss>

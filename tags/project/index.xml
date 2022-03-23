@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>project on 且听疯吟</title><link>https://blog.caoyue.me/tags/project/</link><description>Recent content in project on 且听疯吟</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><managingEditor>i@caoyue.me (caoyue)</managingEditor><webMaster>i@caoyue.me (caoyue)</webMaster><lastBuildDate>Thu, 22 Jun 2017 09:16:00 +0000</lastBuildDate><atom:link href="https://blog.caoyue.me/tags/project/index.xml" rel="self" type="application/rss+xml"/><item><title>Open git repository with browser in powershell</title><link>https://blog.caoyue.me/post/open-git-repository-with-browser-in-powershell/</link><pubDate>Thu, 22 Jun 2017 09:16:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/open-git-repository-with-browser-in-powershell/</guid><description>最近沉迷于 vscode 和 powershell 不能自拔，真的是太好用了~
+顺便撸了一个小功能，用来直接在 powershell 中用浏览器打开对应 git repository 的地址
+食用方法：
+在 powershell 中输入 code $PROFILE 来编辑 profile (或者你也可以使用其他的编辑器~
+将以下内容添加到 profile 文件结尾并保存
+function Open-GitWeb { $r = git remote -v | Select-String -Pattern &amp;#34;(https:\/\/|git@)(?&amp;lt;git&amp;gt;.*)\.git&amp;#34; if ($r.Matches.Length -gt 0) { $t = &amp;#34;https://&amp;#34; + ($r.Matches[0].Groups | Where-Object {$_.Name -eq &amp;#34;git&amp;#34;}).Value.Replace(&amp;#34;:&amp;#34;, &amp;#34;/&amp;#34;) Write-Host &amp;#34;gh: openning &amp;#34;,$t,&amp;#34;...&amp;#34; -ForegroundColor &amp;#34;green&amp;#34; Start-Process $t } else { Write-Host &amp;#34;gh: not a git repository or origin not set correctly.</description></item><item><title>Qzzz</title><link>https://blog.caoyue.me/post/Qzzz/</link><pubDate>Sat, 28 Jun 2014 14:32:17 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/Qzzz/</guid><description>Windows 的计划任务功能不够用，于是试着写了个支持插件和动态加载的定时执行任务工具 Qzzz，暂时是个坑&amp;hellip;
+Qzzz A scheduler app for windows.
+How to use Run as a windows service
+Use Install.bat to install the QzzzService Run as a console
+Run Qzzz.exe and do not close the console. Create a plugin create a config file qzzz.json
+{ &amp;#34;Id&amp;#34;: &amp;#34;323ADBF530C4307B336C670B3F5BD229&amp;#34;, &amp;#34;Name&amp;#34;: &amp;#34;ToastPluginDemo&amp;#34;, &amp;#34;Version&amp;#34;: &amp;#34;1.0&amp;#34;, &amp;#34;Description&amp;#34;: &amp;#34;Toast plugin demo&amp;#34;, &amp;#34;CronExpression&amp;#34;: &amp;#34;*/15 * * * * ?&amp;#34;, &amp;#34;StartAt&amp;#34;: &amp;#34;2014-06-01 00:00:00&amp;#34;, &amp;#34;EndAt&amp;#34;: &amp;#34;2014-07-01 00:01:00&amp;#34;, &amp;#34;PluginFileName&amp;#34;: &amp;#34;Qzzz.</description></item><item><title>A Wox plugin let you search firefox bookmarks</title><link>https://blog.caoyue.me/post/wox-plugin/</link><pubDate>Fri, 25 Apr 2014 23:36:11 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/wox-plugin/</guid><description>###关于 Wox
+最初是看到 V2EX 上的一个帖子 v2ex.com/t/93922，然后作者真的去写了并且发布在 Github 上了。
+Windows 上的快速启动软件已经很多了，但是不管从功能、界面乃至理念来讲和 Alfred 都相去甚远，尤其是 Workflow 的概念。
+Wox 现在发布了第一个 beta 版本，看上去已经很不错了，希望这个项目能坚持下去吧。
+###Wox.Plugin.FirefoxBookmarks
+Wox 的插件开发也比较简单，可以参考文档。写了个搜索 Firefox 书签的插件。
+原理是读取 Firefox 书签，然后根据参数查询返回结果。
+首先我们要获取到 Firefox Profile 的位置。Firefox 支持多个 Profile，我们可以获取到默认的 Profile 。Firefox Profile 路径及配置都保存在 %appdata%\Mozilla\Firefox\profiles.ini 中。打开这个配置文件可以看到每个 Profile 配置包含的参数：&amp;ldquo;IsRelative&amp;rdquo; 值为 &amp;ldquo;0&amp;rdquo; 代表绝对路径，&amp;ldquo;1&amp;rdquo; 代表相对路径；&amp;ldquo;Default=1&amp;rdquo; 代表默认启动的 Profile。
+虽然可以通过引入 WindowsAPI （即 [DllImport(&amp;quot;kernel32&amp;quot;)]）来解析 ini 配置文件，不过无需如此小题大做，毕竟只需要找到其中一行即可。下面是一个读取 Firefox 默认 Profile 的方法：
+gist 11324134
+这种读取方法对某些 Portable 版本无效，所以同时也提供了手动配置路径的方法。
+Firefox 书签以及历史记录都保存在 Profile 里的 places.sqlite 中。其表结构可以参考 developer.mozilla.org/en-US/docs/The_Places_database。
+其中 moz_bookmarks 表中存储了书签及书签文件夹，且通过外键 fk 和 moz_places 关联。</description></item><item><title>Project Timeline</title><link>https://blog.caoyue.me/post/project-timeline/</link><pubDate>Tue, 30 Jul 2013 16:49:59 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/project-timeline/</guid><description>做了一个同步微博、Twitter 和 Rss Feed 到本地的工具，方便保存和查看自己的数据，以及用自己的数据做一些好玩的事。
+MyTimeline
+聚合分散在各个网站上的 Timeline
+Support:
+Rss Feed Twitter Oauth Weibo Oauth 同步发送消息到第三方
+/update
+Support:
+Twitter Weibo 按日期查看过往记录
+/past
+对所有记录的统计图表
+/statistic
+Support：
+按时段统计 按月份统计 按分类统计 TODO
+其他第三方支持 搜索 Other&amp;hellip; Tools
+Linux Python Web.py Nginx/Gunicorn MySql Google Chart Demo
+Demo License
+MIT Feel free to give me some feedback:)</description></item></channel></rss>

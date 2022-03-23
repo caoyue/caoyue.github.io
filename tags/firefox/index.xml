@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>firefox on 且听疯吟</title><link>https://blog.caoyue.me/tags/firefox/</link><description>Recent content in firefox on 且听疯吟</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><managingEditor>i@caoyue.me (caoyue)</managingEditor><webMaster>i@caoyue.me (caoyue)</webMaster><lastBuildDate>Sat, 07 Sep 2013 11:06:11 +0000</lastBuildDate><atom:link href="https://blog.caoyue.me/tags/firefox/index.xml" rel="self" type="application/rss+xml"/><item><title>Firefox 的表单缓存「Bug」</title><link>https://blog.caoyue.me/post/firefox-form-cache/</link><pubDate>Sat, 07 Sep 2013 11:06:11 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/firefox-form-cache/</guid><description>##问题
+在使用 Firefox 测试网站的时候遇到一个奇怪的问题。
+把一份数据写入类型为 hidden 的 input 中时，比如
+&amp;lt;input type=&amp;#34;hidden&amp;#34; value=&amp;#34;@Model.Count&amp;#34; id=&amp;#34;Count&amp;#34; /&amp;gt; 然后在用 Javascript 修改这个值，比如后台数据原为 0，
+var count = parseInt($(&amp;#34;#Count&amp;#34;).val()); $(&amp;#34;#Count&amp;#34;).val(count + 1); 不提交表单，刷新页面，发现 $(&amp;quot;#Count&amp;quot;).val() 的值却不是后台数据的 0，而是我们修改过后的值，这个值被缓存了。
+##原因
+使用其他浏览器测试可以发现，这个问题仅出现在 Firefox 中。从而可以考虑是否 Firefox 对表单缓存的实现「有问题」。
+##解决
+设置 form 的 autocomplete=&amp;quot;off&amp;quot;</description></item></channel></rss>
