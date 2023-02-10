@@ -6,8 +6,7 @@
 Travis CI 连接 Gtihub 后，会自动检查根目录下带有 .travis.yml 的项目
 关于 Travis CI 的功能和文档，请参考 https://docs.travis-ci.com/
 这里给出一个 React Native 项目的 yml 文件示例：
-language:objective-cosx_image:xcode7.1xcode_project:ios/MyApp.xcodeprojxcode_scheme:MyAppenv:matrix:- SPEC=spec1before_install:- ./scripts/decrypt_key.sh- ./scripts/add_key.sh- brew updateinstall:- brew reinstall node flow watchman xctool- npm install -g react-native-clibranches:only:- masterscript:- ./scripts/release.sh首先设置项目编译环境： 包括 language 和 要使用的编译镜像 osx_image，并指定项目文件和编译的 scheme
-证书加密： 由于 iOS 打包过程需要一些证书密钥，这些是无法公开 Push 到 Github 的</description></item><item><title>react and react native</title><link>https://blog.caoyue.me/post/react-and-react-native/</link><pubDate>Tue, 27 Oct 2015 20:20:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/react-and-react-native/</guid><description>最近了解了下 react 和 react native，感觉看到了一条成为「Full-stack Developer」的捷径啊（雾
+language: objective-c osx_image: xcode7.1 xcode_project: ios/MyApp.xcodeproj xcode_scheme: MyApp env: matrix: - SPEC=spec1 before_install: - ./scripts/decrypt_key.sh - ./scripts/add_key.sh - brew update install: - brew reinstall node flow watchman xctool - npm install -g react-native-cli branches: only: - master script: - .</description></item><item><title>react and react native</title><link>https://blog.caoyue.me/post/react-and-react-native/</link><pubDate>Tue, 27 Oct 2015 20:20:00 +0000</pubDate><author>i@caoyue.me (caoyue)</author><guid>https://blog.caoyue.me/post/react-and-react-native/</guid><description>最近了解了下 react 和 react native，感觉看到了一条成为「Full-stack Developer」的捷径啊（雾
 React 消息同步
 不管是 Web 还是 Native 应用，一个很麻烦的问题就是保持某个 Message 在不同 View 之间的状态同步。
 比如，收到一条消息，需要在未读标签显示状态和数字，然后未读列表中插入一条消息记录。
@@ -23,4 +22,7 @@ React + Flux 所做的正和我们很久之前的做法有点像。数据更新�
 React 做到了「智能」去更新 DOM，只改变需要改变的地方。（嗯，就是不相信你能写出高效正确的操作 DOM 的代码，所以我们都帮你写好啦~（雾
 组件化
 通常我们的页面上的控件都是带有不同的状态的，比如选框是否选中等等。而不同情况下状态可能会根据一些参数去变化，这让一般情况下的组件复用变得很麻烦。
-而 React 可以做到类似于函数的给定输入参数，输出固定的状态，可以很方便的实现 Web Components，也不会出现组件状态上的冲突。</description></item></channel></rss>
+而 React 可以做到类似于函数的给定输入参数，输出固定的状态，可以很方便的实现 Web Components，也不会出现组件状态上的冲突。
+而组件化的开发带来的效率提升是非常高的。
+其他
+另外经常看到人说 HTML 嵌在 JS 里面感觉很奇怪是不是模板耦合在代码里面之类的，我倒是觉得这种写法挺简洁优雅的。如果把 JSX 里面的 XML 看作是一个 XML 表示的 Object，这样理解可能会好点吧。当然你也可以使用纯 JS 的方式去写。</description></item></channel></rss>

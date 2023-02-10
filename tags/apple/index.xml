@@ -3,4 +3,6 @@
 这一步没啥好说的，iOS 连接到 APNs 后获取到 device token，发给服务器，服务器负责维护好对应关系即可。
 注意客户端退出时清理掉相应记录。
 在 ejabberd 中新增一个模块，注册 offline_message_hook，大致如下：
-start(Host, Opts) -&amp;gt; ?INFO_MSG(&amp;#34;Starting mod_push_service&amp;#34;, []), register(?MODULE, spawn(?MODULE, init, [Host, Opts])), ok. init(Host, _Opts) -&amp;gt; ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, send_notification, 10), ok. stop(Host) -&amp;gt; ?INFO_MSG(&amp;#34;Stopping mod_push_service&amp;#34;, []), ejabberd_hooks:delete(offline_message_hook, Host, ?MODULE, send_notification, 10), ok. send_notification(From, To, Packet) -&amp;gt; dosomething. 2. Implement APNs 从 Apple 获取推送证书</description></item></channel></rss>
+start(Host, Opts) -&amp;gt; ?INFO_MSG(&amp;#34;Starting mod_push_service&amp;#34;, []), register(?MODULE, spawn(?MODULE, init, [Host, Opts])), ok. init(Host, _Opts) -&amp;gt; ejabberd_hooks:add(offline_message_hook, Host, ?MODULE, send_notification, 10), ok. stop(Host) -&amp;gt; ?INFO_MSG(&amp;#34;Stopping mod_push_service&amp;#34;, []), ejabberd_hooks:delete(offline_message_hook, Host, ?MODULE, send_notification, 10), ok. send_notification(From, To, Packet) -&amp;gt; dosomething. 2. Implement APNs 从 Apple 获取推送证书
+在服务端使用该证书建立 ssl 连接
+按照 Apple 文档生成指定格式的 Payload 并发送</description></item></channel></rss>
