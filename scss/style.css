@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* cyan */
 /* global */
 html {
@@ -192,6 +193,14 @@ table tr:nth-child(2n) {
 
 .list li:hover a {
   color: white; }
+
+@counter-style repeating-emoji {
+  system: cyclic;
+  symbols: 🐱 🐶 🐧 🦊 🦁 🐸 🐔 🐤 🦄 🐼;
+  suffix: " "; }
+
+ul {
+  list-style-type: repeating-emoji; }
 
 .entry {
   margin: 0 3% 120px 3%; }
