@@ -1,4 +1,4 @@
-<!doctype html><html lang=zh-hans><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="default"><meta name=format-detection content="telephone=no"><meta name=theme-color content="#a6d6d6"><meta name=referrer content="no-referrer"><meta name=description content="主要是通过 hook ejabberd 的离线消息处理，从而实现针对离线消息进行推送
+<!doctype html><html lang=zh-Hans><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="default"><meta name=format-detection content="telephone=no"><meta name=theme-color content="#a6d6d6"><meta name=referrer content="no-referrer"><meta name=description content="主要是通过 hook ejabberd 的离线消息处理，从而实现针对离线消息进行推送
 1. Hook offline message 记录 device token
 这一步没啥好说的，iOS 连接到 APNs 后获取到 device token，发给服务器，服务器负责维护好对应关系即可。
 注意客户端退出时清理掉相应记录。
